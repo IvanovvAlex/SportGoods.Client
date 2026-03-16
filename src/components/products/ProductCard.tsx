@@ -4,6 +4,7 @@ import { ShoppingBagIcon, StarIcon } from "@heroicons/react/24/solid";
 import { toast } from "react-toastify";
 import { addItem } from "../../store/slices/cartSlice";
 import { RootState } from "../../store";
+import { formatCurrency } from "../../utils/currency";
 
 interface Product {
   id: string;
@@ -123,9 +124,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
           <div className="mt-6 flex items-end justify-between gap-4">
             <div>
-              <p className="font-display text-2xl font-bold text-slate-950">{displayPrice.toFixed(2)} BGN</p>
+              <p className="font-display text-2xl font-bold text-slate-950">{formatCurrency(displayPrice)}</p>
               {product.discountedPrice && product.discountedPrice > 0 ? (
-                <p className="mt-1 text-sm text-slate-400 line-through">{product.regularPrice.toFixed(2)} BGN</p>
+                <p className="mt-1 text-sm text-slate-400 line-through">{formatCurrency(product.regularPrice)}</p>
               ) : null}
             </div>
             <span className="text-xs text-slate-500">{product.quantity} available</span>

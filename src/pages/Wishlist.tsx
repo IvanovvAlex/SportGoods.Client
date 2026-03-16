@@ -5,6 +5,7 @@ import { removeFromWishlist } from "../store/slices/userSlice";
 import { HeartIcon, ShoppingCartIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { addItem } from "../store/slices/cartSlice";
+import { formatCurrency } from "../utils/currency";
 
 interface Product {
   id: string;
@@ -14,7 +15,8 @@ interface Product {
   regularPrice: number;
   quantity: number;
   categoryId: string;
-  discount?: number;
+  discountPercentage?: number;
+  discountedPrice?: number;
 }
 
 const Wishlist = () => {
@@ -70,14 +72,15 @@ const Wishlist = () => {
 
   const handleAddToCart = (product: Product) => {
     dispatch(
-      addItem({
-        id: product.id,
-        title: product.title,
-        regularPrice:
-          product.regularPrice * (1 - (product.discount || 0) / 100),
-        quantity: 1,
-        mainImageUrl: product.mainImageUrl,
-        imageUrl: "",
+        addItem({
+          id: product.id,
+          title: product.title,
+          regularPrice: product.regularPrice,
+          discountedPrice: product.discountedPrice,
+          discountPercentage: product.discountPercentage,
+          quantity: 1,
+          mainImageUrl: product.mainImageUrl,
+          imageUrl: "",
       })
     );
   };
@@ -131,11 +134,17 @@ const Wishlist = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {wishlistProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
+          {wishlistProducts.map((product) => {
+            const displayPrice =
+              product.discountedPrice && product.discountedPrice > 0
+                ? product.discountedPrice
+                : product.regularPrice;
+
+            return (
+              <div
+                key={product.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
               <div className="relative">
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
                   <img
@@ -166,15 +175,11 @@ const Wishlist = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="space-y-1">
                     <p className="text-lg font-bold text-gray-900">
-                      {product.regularPrice.toFixed(2)} BGN
+                      {formatCurrency(displayPrice)}
                     </p>
-                    {product.discount && (
+                    {product.discountedPrice && product.discountedPrice > 0 && (
                       <p className="text-sm text-gray-500 line-through">
-                        {(
-                          product.regularPrice *
-                          (1 + product.discount / 100)
-                        ).toFixed(2)}{" "}
-                        BGN
+                        {formatCurrency(product.regularPrice)}
                       </p>
                     )}
                   </div>
@@ -196,8 +201,9 @@ const Wishlist = () => {
                   </Link>
                 </div>
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

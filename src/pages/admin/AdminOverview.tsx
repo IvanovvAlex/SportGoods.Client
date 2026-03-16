@@ -3,6 +3,7 @@ import { BellAlertIcon, CubeTransparentIcon, ShoppingBagIcon, UserGroupIcon } fr
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { OrderStatus, getOrderStatusText } from "../../enums/OrderStatus";
+import { formatCurrency } from "../../utils/currency";
 
 interface Category {
   id: string;
@@ -174,7 +175,7 @@ const AdminOverview = () => {
           },
           {
             label: "Revenue this week",
-            value: `${weeklyRevenue.toFixed(2)} BGN`,
+            value: formatCurrency(weeklyRevenue),
             detail: "Last 7 days, excluding cancelled orders",
             icon: BellAlertIcon,
           },
@@ -278,7 +279,7 @@ const AdminOverview = () => {
                   <td className="px-4 py-4 text-slate-900">{order.names ?? "Customer"}</td>
                   <td className="px-4 py-4 text-slate-600">{order.items.length} {order.items.length === 1 ? "item" : "items"}</td>
                   <td className="px-4 py-4 text-slate-600">{getOrderStatusText(order.status)}</td>
-                  <td className="px-4 py-4 text-right font-semibold text-slate-900">{order.orderTotalPrice.toFixed(2)} BGN</td>
+                  <td className="px-4 py-4 text-right font-semibold text-slate-900">{formatCurrency(order.orderTotalPrice)}</td>
                 </tr>
               ))}
               {recentOrders.length === 0 && (

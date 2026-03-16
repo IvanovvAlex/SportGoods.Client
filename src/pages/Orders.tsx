@@ -10,6 +10,7 @@ import {
   getOrderStatusColor,
 } from "../enums/OrderStatus";
 import { decodeJWT } from "../utils/jwtUtils";
+import { formatCurrency } from "../utils/currency";
 
 interface Order {
   id: string;
@@ -275,10 +276,7 @@ const Orders = () => {
                             Order total:
                           </span>
                           <span className="text-lg font-semibold text-gray-900">
-                            {new Intl.NumberFormat("bg-BG", {
-                              style: "currency",
-                              currency: "BGN",
-                            }).format(order?.orderTotalPrice || 0)}
+                            {formatCurrency(order?.orderTotalPrice)}
                           </span>
                         </div>
                       </div>

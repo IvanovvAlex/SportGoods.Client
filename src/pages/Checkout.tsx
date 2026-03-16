@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { RootState } from "../store";
+import { formatCurrency } from "../utils/currency";
 
 interface CartItem {
   productId: string;
@@ -301,13 +302,13 @@ const Checkout = () => {
                       <p className="text-sm font-semibold text-slate-900">{item.title}</p>
                       <p className="text-xs text-slate-500">Quantity: {item.quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold text-slate-900">{item.totalPrice.toFixed(2)} BGN</p>
+                    <p className="text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice)}</p>
                   </div>
                 ))}
               </div>
               <div className="mt-6 rounded-2xl bg-slate-950 px-4 py-4 text-white">
                 <p className="text-sm text-slate-300">Total</p>
-                <p className="mt-2 font-display text-3xl font-bold">{cart?.orderTotalPrice.toFixed(2) ?? "0.00"} BGN</p>
+                <p className="mt-2 font-display text-3xl font-bold">{formatCurrency(cart?.orderTotalPrice)}</p>
               </div>
             </div>
 

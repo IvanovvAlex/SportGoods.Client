@@ -5,6 +5,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { formatCurrency } from "../utils/currency";
 
 interface CartItem {
   productId: string;
@@ -255,7 +256,7 @@ const Cart = () => {
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-primary-600 font-semibold">
-                      {item.singlePrice.toFixed(2)} BGN
+                      {formatCurrency(item.singlePrice)}
                     </p>
                     <span className="text-gray-400">×</span>
                     <p className="text-primary-600 font-semibold">
@@ -263,7 +264,7 @@ const Cart = () => {
                     </p>
                     <span className="text-gray-400">=</span>
                     <p className="text-primary-600 font-semibold">
-                      {(item.singlePrice * item.quantity).toFixed(2)} BGN
+                      {formatCurrency(item.singlePrice * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -310,7 +311,7 @@ const Cart = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="space-y-1">
                 <p className="text-xl font-semibold text-gray-900">
-                  Order total: {cart.orderTotalPrice.toFixed(2)} BGN
+                  Order total: {formatCurrency(cart.orderTotalPrice)}
                 </p>
               </div>
               <button

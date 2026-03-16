@@ -11,6 +11,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { formatCurrency } from "../../utils/currency";
 
 interface Category {
   id: string;
@@ -519,7 +520,7 @@ const AdminProducts = () => {
                       Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
+                      Price (EUR)
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Discount
@@ -543,14 +544,7 @@ const AdminProducts = () => {
                           ?.name || "Uncategorized"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Intl.NumberFormat("bg-BG", {
-                          style: "currency",
-                          currency: "BGN",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(
-                          product.discountedPrice || product.regularPrice || 0
-                        )}
+                        {formatCurrency(product.discountedPrice || product.regularPrice || 0)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {product.discountPercentage
@@ -693,7 +687,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Regular price
+                    Regular price (EUR)
                   </label>
                   <input
                     type="string"
@@ -715,7 +709,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Sale price
+                    Sale price (EUR)
                   </label>
                   <input
                     type="string"

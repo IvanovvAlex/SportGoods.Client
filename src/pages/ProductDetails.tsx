@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { formatCurrency } from "../utils/currency";
 
 interface Product {
   id: string;
@@ -606,10 +607,10 @@ const ProductDetails = () => {
               {product.discountPercentage ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-2xl font-bold text-primary-600">
-                    {product.discountedPrice?.toFixed(2)} BGN
+                    {formatCurrency(product.discountedPrice)}
                   </span>
                   <span className="text-lg text-gray-500 line-through">
-                    {product.regularPrice.toFixed(2)} BGN
+                    {formatCurrency(product.regularPrice)}
                   </span>
                   <span className="bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-sm">
                     -{product.discountPercentage}%
@@ -617,7 +618,7 @@ const ProductDetails = () => {
                 </div>
               ) : (
                 <span className="text-2xl font-bold text-primary-600">
-                  {product.regularPrice.toFixed(2)} BGN
+                  {formatCurrency(product.regularPrice)}
                 </span>
               )}
             </div>

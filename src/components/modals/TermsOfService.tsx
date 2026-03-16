@@ -66,7 +66,7 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
                   <section className="space-y-2">
                     <h4 className="font-semibold">3. Orders and payment</h4>
                     <p className="text-sm">
-                      All prices are shown in Bulgarian lev and include VAT. Payment can be made using the methods shown at checkout.
+                      All prices are shown in euro (EUR) and include VAT. Payment can be made using the methods shown at checkout.
                     </p>
                   </section>
 
