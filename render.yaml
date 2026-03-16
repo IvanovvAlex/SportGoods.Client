@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: sportgoods-client
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
-    autoDeploy: true
