@@ -1,243 +1,145 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser, setToken } from "../../store/slices/authSlice";
-import { decodeJWT } from "../../utils/jwtUtils";
+import { setToken, setUser } from "../../store/slices/authSlice";
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId?: string;
+  email?: string;
+  names?: string;
+  phone?: string;
+  role?: string;
+}
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showErrorMessage, setShowErrorMessage] = useState(true);
-  useEffect(() => {
-    if (error) {
-      setShowErrorMessage(true);
-      const hideTimer = setTimeout(() => {
-        setShowErrorMessage(false);
-      }, 4000);
-      const clearTimer = setTimeout(() => {
-        setError("");
-      }, 5000);
-
-      return () => {
-        clearTimeout(hideTimer);
-        clearTimeout(clearTimer);
-      };
-    }
-  }, [error]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const successMessage = location.state?.message;
-  const [localSuccessMessage, setLocalSuccessMessage] = useState(
-    successMessage || ""
-  );
-  const [showSuccessMessage, setShowSuccessMessage] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (localSuccessMessage) {
-      setShowSuccessMessage(true);
-      const hideTimer = setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 4000); // start fade out at 4 seconds
-      const clearTimer = setTimeout(() => {
-        setLocalSuccessMessage("");
-      }, 5000); // remove after 5 seconds
+  const successMessage = (location.state as { message?: string } | null)?.message;
 
-      return () => {
-        clearTimeout(hideTimer);
-        clearTimeout(clearTimer);
-      };
-    }
-  }, [localSuccessMessage]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() && !password.trim()) {
-      setError("Моля попълнете всички полета");
-      return;
-    }
-    setError("");
-    setIsLoading(true);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        throw new Error("Моля въведете правилен имейл и парола");
-        return;
-      }
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error("Моля въведете правилен имейл и парола");
+        throw new Error("Invalid credentials");
       }
 
-      if (!data.accessToken) {
-        throw new Error("Моля въведете правилен имейл и парола");
-      }
-
-      // Decode the JWT token to get user information
-      const decodedToken = decodeJWT(data.accessToken);
-      const role =
-        decodedToken?.[
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ];
+      const data = (await response.json()) as LoginResponse;
 
       dispatch(setToken(data.accessToken));
       dispatch(
         setUser({
-          id: data.id,
-          email: data.email,
-          name: data.names,
-          role: role || "User",
+          id: data.userId ?? "",
+          email: data.email ?? email,
+          name: data.names ?? "SportGoods User",
+          phone: data.phone ?? "",
+          role: data.role ?? "RegisteredCustomer",
         })
       );
 
-      if (role === "Admin") {
-        navigate("/admin/products");
-      } else {
-        navigate("/");
+      if (data.role === "Admin") {
+        navigate("/admin");
+        return;
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Моля въведете правилен имейл и парола");
+
+      navigate("/");
+    } catch (requestError) {
+      console.error(requestError);
+      setError("Please enter a valid email and password.");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-dark-200 p-8 rounded-lg shadow-xl">
-        <div>
-          <h2 className="mt-4 text-center text-3xl font-extrabold text-dark-700">
-            Вход в акаунта
-          </h2>
-          <p className="mt-2 text-center text-sm text-dark-700">
-            Нямате акаунт?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-primary-400 hover:text-primary-300"
-            >
-              Регистрирайте се тук
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {localSuccessMessage && (
-            <div
-              className={`border border-green-500 text-green-400 px-4 py-3 rounded transition-opacity duration-1000 ${
-                showSuccessMessage ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {localSuccessMessage}
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
+      <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Customer access</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Login to your account</h1>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          Continue to cart, checkout, order tracking, profile privacy tools, and the admin dashboard if your account has admin rights.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          {successMessage && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {successMessage}
             </div>
           )}
           {error && (
-            <div
-              className={`border border-red-500 text-red-400 px-4 py-3 rounded transition-opacity duration-1000 ${
-                showErrorMessage ? "opacity-100" : "opacity-0"
-              }`}
-            >
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
             </div>
           )}
-          <div className="grid grid-cols-1 gap-6">
-            <div className="space-y-1">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Имейл адрес <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="text"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                  transition duration-150 ease-in-out
-                  placeholder-gray-400 text-gray-900
-                  hover:border-gray-400"
-                placeholder="Въведете имейл адрес"
-              />
-            </div>
-            <div className="space-y-1">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Парола <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                  transition duration-150 ease-in-out
-                  placeholder-gray-400 text-gray-900
-                  hover:border-gray-400"
-                placeholder="Въведете парола"
-              />
-            </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+              placeholder="you@example.com"
+            />
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-dark-900 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Влизане...
-                </span>
-              ) : (
-                "Вход"
-              )}
-            </button>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                Password
+              </label>
+              <Link to="/forgot-password" className="text-sm font-semibold text-primary-600">
+                Forgot password?
+              </Link>
+            </div>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+              placeholder="Enter your password"
+            />
           </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isSubmitting ? "Signing in..." : "Login"}
+          </button>
         </form>
+
+        <p className="mt-6 text-sm text-slate-500">
+          No account yet? <Link to="/register" className="font-semibold text-primary-600">Create one</Link>
+        </p>
       </div>
     </div>
   );

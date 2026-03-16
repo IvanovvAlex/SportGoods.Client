@@ -130,7 +130,7 @@ const ProductDetails = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://sportgoods-api.onrender.com/api/Products/${id}`
+          `${import.meta.env.VITE_API_URL}/Products/${id}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch product");
@@ -162,7 +162,7 @@ const ProductDetails = () => {
       });
 
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Reviews?${queryParams}`,
+        `${import.meta.env.VITE_API_URL}/Reviews?${queryParams}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -215,7 +215,7 @@ const ProductDetails = () => {
 
     try {
       const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Orders/",
+        `${import.meta.env.VITE_API_URL}/Orders/`,
         {
           method: "PUT",
           headers: {
@@ -262,7 +262,7 @@ const ProductDetails = () => {
 
   const handleWishlistToggle = () => {
     if (!product) return;
-    fetch(`https://sportgoods-api.onrender.com/api/Wishlist/add-product`, {
+    fetch(`${import.meta.env.VITE_API_URL}/Wishlist/add-product`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -305,7 +305,7 @@ const ProductDetails = () => {
 
     try {
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Reviews`,
+        `${import.meta.env.VITE_API_URL}/Reviews`,
         {
           method: "POST",
           headers: {
@@ -385,7 +385,7 @@ const ProductDetails = () => {
     const deleteReview = async (id: string) => {
       try {
         const response = await fetch(
-          `https://sportgoods-api.onrender.com/api/Reviews/${id}`,
+          `${import.meta.env.VITE_API_URL}/Reviews/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -422,7 +422,7 @@ const ProductDetails = () => {
   const handleEditReview = async (reviewId: string) => {
     try {
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Reviews/`,
+        `${import.meta.env.VITE_API_URL}/Reviews/`,
         {
           method: "PUT",
           headers: {

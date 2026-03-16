@@ -1,290 +1,331 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { RootState } from "../store";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { toast, Toaster } from "react-hot-toast";
 
-const Toast = ({
-  message,
-  type,
-}: {
-  message: string;
-  type: "success" | "error";
-}) => {
-  return (
-    <div
-      className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      } text-white`}
-    >
-      {message}
-    </div>
-  );
-};
+interface CartItem {
+  productId: string;
+  quantity: number;
+  totalPrice: number;
+  title: string;
+}
+
+interface CartResponse {
+  orderTotalPrice: number;
+  items: CartItem[];
+}
+
+interface ProfileResponse {
+  email: string;
+  names: string;
+  phone: string;
+}
+
+const paymentOptions = [
+  { value: "online-card", label: "Online card payment", description: "Demo online gateway configured through backend appsettings." },
+  { value: "bank-transfer", label: "Bank transfer", description: "Manual confirmation flow with bank transfer instructions." },
+];
+
+const deliveryOptions = [
+  { value: "standard-courier", label: "Standard courier", description: "2-4 business days" },
+  { value: "express-courier", label: "Express courier", description: "Next-business-day delivery" },
+];
 
 const Checkout = () => {
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error">("success");
-  const [orderData, setOrderData] = useState({
+  const [cart, setCart] = useState<CartResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
     names: "",
     postalCode: "",
-    country: "",
+    country: "Bulgaria",
     city: "",
     address: "",
     phone: "",
+    paymentMethod: "online-card",
+    deliveryMethod: "standard-courier",
+    consentAccepted: false,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const showToastMessage = (
-    message: string,
-    type: "success" | "error",
-    duration: number = 3000,
-    callback?: () => void
-  ) => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-      if (callback) callback();
-    }, duration);
-  };
+  useEffect(() => {
+    const fetchCheckoutData = async () => {
+      try {
+        const [cartResponse, profileResponse] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/Orders`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/Auth/me`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setOrderData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmitOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token) {
-      toast.error("Моля, влезте в профила си преди да направите поръчка");
-      return;
-    }
-    const { names, postalCode, country, city, address, phone } = orderData;
-    if (!names || !postalCode || !country || !city || !address || !phone) {
-      toast.error("Моля, попълнете всички полета", {
-        duration: 3000,
-        position: "top-center",
-      });
-      return;
-    }
-    toast.success("Обработване на поръчката...", {
-      duration: 3000,
-      position: "top-center",
-    });
-    try {
-      const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Orders",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(orderData),
+        if (!cartResponse.ok) {
+          throw new Error("No active cart found.");
         }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to submit order");
+
+        const cartData = (await cartResponse.json()) as CartResponse;
+        setCart(cartData);
+
+        if (profileResponse.ok) {
+          const profileData = (await profileResponse.json()) as ProfileResponse;
+          setFormData((previous) => ({
+            ...previous,
+            names: profileData.names ?? previous.names,
+            phone: profileData.phone ?? previous.phone,
+          }));
+        }
+      } catch (requestError) {
+        console.error(requestError);
+        setError("Checkout data could not be loaded. Please review your cart and try again.");
+      } finally {
+        setIsLoading(false);
       }
-      toast.success("Поръчката беше направена успешно!", {
-        duration: 2000,
-        position: "top-center",
+    };
+
+    void fetchCheckoutData();
+  }, [token]);
+
+  const selectedPayment = useMemo(
+    () => paymentOptions.find((option) => option.value === formData.paymentMethod) ?? paymentOptions[0],
+    [formData.paymentMethod]
+  );
+
+  const selectedDelivery = useMemo(
+    () => deliveryOptions.find((option) => option.value === formData.deliveryMethod) ?? deliveryOptions[0],
+    [formData.deliveryMethod]
+  );
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+
+    if (!cart || cart.items.length === 0) {
+      setError("Your cart is empty.");
+      return;
+    }
+
+    if (!formData.consentAccepted) {
+      setError("You must accept personal data processing for the order.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
       });
-      setTimeout(() => {
-        toast.success("Благодарим ви за поръчката!", {
-          duration: 4000,
-          position: "top-center",
-          style: {
-            background: "#4CAF50",
-            color: "#fff",
-            fontSize: "1.1rem",
-            padding: "1rem 2rem",
-            borderRadius: "0.5rem",
-          },
-        });
-        navigate("/");
-      }, 2000);
-    } catch (error) {
-      console.error("Error submitting order:", error);
-      toast.error("Възникна грешка при изпращането на поръчката");
+
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(responseText || "Unable to place the order.");
+      }
+
+      navigate("/checkout/confirmation", {
+        state: {
+          names: formData.names,
+          city: formData.city,
+          address: formData.address,
+          paymentMethodLabel: selectedPayment.label,
+          deliveryMethodLabel: selectedDelivery.label,
+        },
+      });
+    } catch (requestError) {
+      console.error(requestError);
+      setError(requestError instanceof Error ? requestError.message : "Unable to place the order.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-100 border-t-primary-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
-      <Toaster position="top-center" />
-      {showToast && <Toast message={toastMessage} type={toastType} />}
-      <div className="max-w-2xl mx-auto">
+    <div className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
         <button
+          type="button"
           onClick={() => navigate(-1)}
-          className="flex items-center text-white mb-6"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary-300 hover:text-primary-700"
         >
-          <ArrowLeftIcon className="h-5 w-5 mr-2" />
-          Назад
+          <ArrowLeftIcon className="h-4 w-4" />
+          Back
         </button>
 
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">
-              Информация за поръчката
-            </h1>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <form onSubmit={handleSubmit} className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_28px_90px_-60px_rgba(15,23,42,0.55)] sm:p-8">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Checkout</p>
+              <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Delivery, payment, and order confirmation</h1>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                This flow follows the presentation activity and sequence diagrams: availability is checked,
+                payment method is selected, and the order moves into status tracking.
+              </p>
+            </div>
 
-            <form onSubmit={handleSubmitOrder} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <label
-                    htmlFor="names"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Имена <span className="text-red-500">*</span>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {[
+                { key: "names", label: "Full name", type: "text" },
+                { key: "phone", label: "Phone", type: "tel" },
+                { key: "postalCode", label: "Postal code", type: "text" },
+                { key: "city", label: "City", type: "text" },
+                { key: "country", label: "Country", type: "text" },
+                { key: "address", label: "Address", type: "text", full: true },
+              ].map((field) => (
+                <div key={field.key} className={field.full ? "sm:col-span-2" : ""}>
+                  <label htmlFor={field.key} className="block text-sm font-medium text-slate-700">
+                    {field.label}
                   </label>
                   <input
-                    type="text"
-                    id="names"
-                    name="names"
-                    value={orderData.names}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете пълното си име"
+                    id={field.key}
+                    type={field.type}
+                    required
+                    value={formData[field.key as keyof typeof formData] as string}
+                    onChange={(event) =>
+                      setFormData((previous) => ({
+                        ...previous,
+                        [field.key]: event.target.value,
+                      }))
+                    }
+                    className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
                   />
                 </div>
+              ))}
+            </div>
 
-                <div className="space-y-1">
-                  <label
-                    htmlFor="postalCode"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Пощенски код <span className="text-red-500">*</span>
+            <div className="grid gap-5 xl:grid-cols-2">
+              <div className="space-y-3">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Payment method</p>
+                {paymentOptions.map((option) => (
+                  <label key={option.value} className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-primary-300">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value={option.value}
+                      checked={formData.paymentMethod === option.value}
+                      onChange={(event) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          paymentMethod: event.target.value,
+                        }))
+                      }
+                      className="mt-1 h-4 w-4 border-slate-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-slate-900">{option.label}</span>
+                      <span className="mt-1 block text-sm text-slate-500">{option.description}</span>
+                    </span>
                   </label>
-                  <input
-                    type="text"
-                    id="postalCode"
-                    name="postalCode"
-                    value={orderData.postalCode}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете пощенски код"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label
-                    htmlFor="country"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Държава <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="country"
-                    name="country"
-                    value={orderData.country}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете държава"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label
-                    htmlFor="city"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Град <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="city"
-                    name="city"
-                    value={orderData.city}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете град"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1">
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Адрес <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={orderData.address}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете пълен адрес"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1">
-                  <label
-                    htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Телефон <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={orderData.phone}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm 
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-                      transition duration-150 ease-in-out
-                      placeholder-gray-400 text-gray-900
-                      hover:border-gray-400"
-                    placeholder="Въведете телефонен номер"
-                  />
-                </div>
+                ))}
               </div>
 
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-                >
-                  Завърши поръчката
-                </button>
+              <div className="space-y-3">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Delivery method</p>
+                {deliveryOptions.map((option) => (
+                  <label key={option.value} className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-primary-300">
+                    <input
+                      type="radio"
+                      name="deliveryMethod"
+                      value={option.value}
+                      checked={formData.deliveryMethod === option.value}
+                      onChange={(event) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          deliveryMethod: event.target.value,
+                        }))
+                      }
+                      className="mt-1 h-4 w-4 border-slate-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-slate-900">{option.label}</span>
+                      <span className="mt-1 block text-sm text-slate-500">{option.description}</span>
+                    </span>
+                  </label>
+                ))}
               </div>
-            </form>
-          </div>
+            </div>
+
+            <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={formData.consentAccepted}
+                onChange={(event) =>
+                  setFormData((previous) => ({
+                    ...previous,
+                    consentAccepted: event.target.checked,
+                  }))
+                }
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span>
+                I consent to the processing of my personal data for delivery, payment, and order status communication.
+              </span>
+            </label>
+
+            {error && <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isSubmitting ? "Placing order..." : "Place order"}
+            </button>
+          </form>
+
+          <aside className="space-y-6">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_28px_90px_-60px_rgba(15,23,42,0.55)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Order summary</p>
+              <div className="mt-6 space-y-4">
+                {cart?.items.map((item) => (
+                  <div key={item.productId} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                      <p className="text-xs text-slate-500">Quantity: {item.quantity}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-900">{item.totalPrice.toFixed(2)} лв.</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 rounded-2xl bg-slate-950 px-4 py-4 text-white">
+                <p className="text-sm text-slate-300">Total</p>
+                <p className="mt-2 font-display text-3xl font-bold">{cart?.orderTotalPrice.toFixed(2) ?? "0.00"} лв.</p>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_28px_90px_-60px_rgba(15,23,42,0.55)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Selected flow</p>
+              <div className="mt-5 space-y-4 text-sm text-slate-600">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                  <p className="font-semibold text-slate-900">{selectedPayment.label}</p>
+                  <p className="mt-1">{selectedPayment.description}</p>
+                </div>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                  <p className="font-semibold text-slate-900">{selectedDelivery.label}</p>
+                  <p className="mt-1">{selectedDelivery.description}</p>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>

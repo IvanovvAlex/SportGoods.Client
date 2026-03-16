@@ -41,7 +41,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('https://sportgoods-api.onrender.com/api/Users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -142,8 +142,8 @@ const AdminUsers = () => {
 
     try {
       const url = selectedUser 
-        ? `https://sportgoods-api.onrender.com/api/Users`
-        : 'https://sportgoods-api.onrender.com/api/Users';
+        ? `${import.meta.env.VITE_API_URL}/Users`
+        : `${import.meta.env.VITE_API_URL}/Users`;
 
       const response = await fetch(url, {
         method: selectedUser ? 'PUT' : 'POST',
@@ -195,7 +195,7 @@ const AdminUsers = () => {
     if (!selectedUser) return;
 
     try {
-      const response = await fetch(`https://sportgoods-api.onrender.com/api/Users/${selectedUser.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Users/${selectedUser.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -221,8 +221,8 @@ const AdminUsers = () => {
       if (!currentUser) return;
 
       const endpoint = currentUser.role === 'Admin' 
-        ? 'https://sportgoods-api.onrender.com/api/Users/demote-to-registered-customer'
-        : 'https://sportgoods-api.onrender.com/api/Users/promote-to-admin';
+        ? `${import.meta.env.VITE_API_URL}/Users/demote-to-registered-customer`
+        : `${import.meta.env.VITE_API_URL}/Users/promote-to-admin`;
 
       const response = await fetch(endpoint, {
         method: 'PUT',

@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import ProductCard from "../components/products/ProductCard";
 import FilterSidebar from "../components/products/FilterSidebar";
 import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Product } from "../types";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 interface FilterState {
   category: string | null;
@@ -46,7 +44,7 @@ const Products = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://sportgoods-api.onrender.com/api/Categories"
+          `${import.meta.env.VITE_API_URL}/Categories`
         );
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -73,14 +71,6 @@ const Products = () => {
     const maxPrice = searchParams.get("maxPrice");
     const rating = searchParams.get("rating");
 
-    console.log("Initializing filters from URL:", {
-      category,
-      search,
-      minPrice,
-      maxPrice,
-      rating,
-    });
-
     setFilters((prev) => ({
       ...prev,
       category: category || null,
@@ -95,7 +85,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        let url = "https://sportgoods-api.onrender.com/api/Products";
+        let url = `${import.meta.env.VITE_API_URL}/Products`;
         const params = new URLSearchParams();
 
         if (filters.search.trim() !== "") {
@@ -125,10 +115,8 @@ const Products = () => {
           url += `?${queryString}`;
         }
 
-        console.log("Fetching products with URL:", url);
         const response = await fetch(url);
         const data = await response.json();
-        console.log("Products response:", data);
 
         if (data.items && Array.isArray(data.items)) {
           setProducts(data.items);
@@ -161,9 +149,7 @@ const Products = () => {
   }, [filters]);
 
   const handleApplyFilters = (newFilters: Partial<FilterState>) => {
-    console.log("Applying new filters:", newFilters);
     const updatedFilters = { ...filters, ...newFilters };
-    console.log("Updated filters:", updatedFilters);
 
     setFilters(updatedFilters);
 
@@ -184,7 +170,6 @@ const Products = () => {
       newParams.set("rating", updatedFilters.rating.toString());
     }
 
-    console.log("Setting new URL params:", newParams.toString());
     setSearchParams(newParams);
   };
 
@@ -215,30 +200,31 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
-      <ToastContainer />
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.55)]">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-black">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Store</p>
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">
               {getCategoryName(filters.category)
-                ? `${getCategoryName(filters.category)} Продукти`
-                : "Всички продукти"}
+                  ? `${getCategoryName(filters.category)} products`
+                  : "All products"}
             </h1>
-            <p className="text-black mt-2">
-              Показване на {products.length} от {totalCount} продукта
+            <p className="mt-2 text-sm text-slate-600">
+                Showing {products.length} of {totalCount} products with category and price filters from the project scope.
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <label htmlFor="pageSize" className="text-sm text-gray-600">
-                Продукти на страница:
+            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center space-x-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
+              <label htmlFor="pageSize" className="text-sm text-slate-600">
+                Per page:
               </label>
               <select
                 id="pageSize"
                 value={filters.pageSize}
                 onChange={handlePageSizeChange}
-                className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 outline-none"
               >
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -246,25 +232,26 @@ const Products = () => {
                 <option value="100">100</option>
               </select>
             </div>
-            {user?.role === "admin" && (
-              <div className="flex space-x-4">
+            {user?.role === "Admin" && (
+                <div className="flex flex-wrap gap-3">
                 <Link
-                  to="/admin/products/new"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+                    to="/admin/products"
+                    className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
                 >
-                  <PlusIcon className="h-5 w-5 mr-2" />
-                  Нов продукт
+                    <PencilIcon className="mr-2 h-5 w-5" />
+                    Manage products
                 </Link>
                 <Link
-                  to="/admin/products"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+                  to="/admin"
+                  className="inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
                 >
-                  <PencilIcon className="h-5 w-5 mr-2" />
-                  Управление на продуктите
+                    <PlusIcon className="mr-2 h-5 w-5" />
+                    Open dashboard
                 </Link>
               </div>
             )}
           </div>
+        </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">
@@ -282,10 +269,10 @@ const Products = () => {
               ))}
             </div>
 
-            {products.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-dark-600 text-lg">
-                  Няма намерени продукти, отговарящи на вашите критерии.
+              {products.length === 0 && (
+                <div className="rounded-[2rem] border border-slate-200 bg-white py-16 text-center shadow-[0_24px_80px_-60px_rgba(15,23,42,0.55)]">
+                  <p className="text-lg text-slate-600">
+                    No products match the current filters.
                 </p>
               </div>
             )}

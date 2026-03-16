@@ -1,49 +1,60 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-secondary-900 text-white pt-12 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center justify-items-center">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold mb-4">За SportGoods</h3>
-            <p className="text-secondary-300">
-              Вашият надежден партньор за качествена спортна екипировка и аксесоари.
+    <footer className="border-t border-slate-200 bg-slate-950 text-slate-100">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.5fr_1fr_1fr] lg:px-8">
+        <div className="space-y-5">
+          <div>
+            <p className="font-display text-2xl font-bold tracking-tight">SportGoods</p>
+            <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">
+              Online sports store aligned to the project prototype: clear shopping flows, secure checkout,
+              category browsing, and an admin workspace for orders, inventory, and users.
             </p>
           </div>
-
-          <div className="text-center">
-            <h3 className="text-lg font-semibold mb-4">Бързи Връзки</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/products" className="text-secondary-300 hover:text-white">
-                  Продукти
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-secondary-300 hover:text-white">
-                  За Нас
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-center">
-            <h3 className="text-lg font-semibold mb-4">Контакти</h3>
-            <ul className="space-y-2 text-secondary-300">
-              <li>Телефон: +359 888 123 456</li>
-              <li>Имейл: info@sportgoods.bg</li>
-              <li>Адрес: ул. Спортна 123, София</li>
-            </ul>
+          <div className="grid gap-2 text-sm text-slate-400">
+            <p>Email: support@sportgoods.bg</p>
+            <p>Phone: +359 88 812 3456</p>
+            <p>Address: 2 Dragan Draganov Str., Ruse, Bulgaria</p>
           </div>
         </div>
 
-        <div className="border-t border-secondary-800 mt-8 pt-8 text-center text-secondary-400">
-          <p>&copy; {new Date().getFullYear()} SportGoods. Всички права запазени.</p>
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Platform</p>
+          <div className="mt-5 grid gap-3 text-sm">
+            <Link to="/store" className="text-slate-300 transition hover:text-white">
+              Store
+            </Link>
+            <Link to="/about" className="text-slate-300 transition hover:text-white">
+              About us
+            </Link>
+            <Link to="/orders" className="text-slate-300 transition hover:text-white">
+              Order status
+            </Link>
+            <Link to="/profile" className="text-slate-300 transition hover:text-white">
+              Privacy and profile
+            </Link>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Operational</p>
+          <div className="mt-5 space-y-3 rounded-3xl border border-slate-800 bg-white/5 p-5 text-sm text-slate-300">
+            <p>HTTPS enabled in backend startup.</p>
+            <p>Password reset, GDPR export, and account deletion entry points are available from the UI.</p>
+            <p>Order confirmation and status updates are prepared through the configured notification service.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-800">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>&copy; {new Date().getFullYear()} SportGoods. All rights reserved.</p>
+          <p>Built for the SportGoods university project baseline and local developer workflows.</p>
         </div>
       </div>
     </footer>
   );
 };
 
-export default Footer; 
+export default Footer;

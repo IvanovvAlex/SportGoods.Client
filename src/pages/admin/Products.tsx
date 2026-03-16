@@ -105,7 +105,7 @@ const AdminProducts = () => {
   const fetchCategories = async () => {
     try {
       const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Categories",
+        `${import.meta.env.VITE_API_URL}/Categories`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -136,7 +136,7 @@ const AdminProducts = () => {
       });
 
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Products?${queryParams.toString()}`,
+        `${import.meta.env.VITE_API_URL}/Products?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -326,8 +326,8 @@ const AdminProducts = () => {
       };
 
       const url = isEditing
-        ? `https://sportgoods-api.onrender.com/api/Products`
-        : `https://sportgoods-api.onrender.com/api/Products`;
+        ? `${import.meta.env.VITE_API_URL}/Products`
+        : `${import.meta.env.VITE_API_URL}/Products`;
       const method = isEditing ? "PUT" : "POST";
 
       console.log("Submitting data:", submitData);
@@ -413,7 +413,7 @@ const AdminProducts = () => {
 
     try {
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Products/${productToDelete.id}`,
+        `${import.meta.env.VITE_API_URL}/Products/${productToDelete.id}`,
         {
           method: "DELETE",
           headers: {

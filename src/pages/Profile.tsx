@@ -1,225 +1,271 @@
-import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { ArrowDownTrayIcon, ExclamationTriangleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { RootState } from "../store";
+import { logout } from "../store/slices/authSlice";
+
+interface ProfileResponse {
+  email: string;
+  names: string;
+  phone: string;
+}
 
 const Profile = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    names: '',
-    email: '',
-    phone: '',
+  const dispatch = useDispatch();
+  const token = useSelector((state: RootState) => state.auth.token);
+  const [profile, setProfile] = useState<ProfileResponse>({
+    email: "",
+    names: "",
+    phone: "",
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/Auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load profile.");
+        }
+
+        const data = (await response.json()) as ProfileResponse;
+        setProfile({
+          email: data.email,
+          names: data.names,
+          phone: data.phone,
+        });
+      } catch (requestError) {
+        console.error(requestError);
+        setError("Unable to load account details.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchProfile();
+  }, [token]);
+
+  const saveProfile = async () => {
+    setError(null);
+    setMessage(null);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Auth/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to save profile.");
+      }
+
+      setIsEditing(false);
+      setMessage("Profile updated successfully.");
+    } catch (requestError) {
+      console.error(requestError);
+      setError("Unable to update profile.");
+    }
+  };
+
+  const exportData = async () => {
+    setError(null);
+    setMessage(null);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Gdpr/export`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to export personal data.");
+      }
+
+      const data = await response.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = "sportgoods-personal-data.json";
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+      setMessage("Personal data export downloaded.");
+    } catch (requestError) {
+      console.error(requestError);
+      setError("Unable to export personal data.");
+    }
+  };
+
+  const deleteAccount = async () => {
+    const confirmed = window.confirm("Delete and anonymize your account data?");
+    if (!confirmed) {
       return;
     }
 
-    setFormData({
-      names: user.name || '',
-      email: user.email || '',
-      phone: user.phone || '',
-    });
-  }, [user, navigate]);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Gdpr/delete-account`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+      if (!response.ok) {
+        throw new Error("Unable to delete account.");
+      }
+
+      dispatch(logout());
+      navigate("/login");
+    } catch (requestError) {
+      console.error(requestError);
+      setError("Unable to delete account.");
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement profile update API call
-    setIsEditing(false);
-  };
-
-  if (!user) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-100 border-t-primary-500" />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="md:grid md:grid-cols-3 md:gap-6">
-          <div className="md:col-span-1">
-            <div className="px-4 sm:px-0">
-              <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Профилна информация
-              </h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Това е информацията, свързана с вашия акаунт.
-              </p>
+    <div className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.55)]">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+                <UserCircleIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Account profile</p>
+                <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-950">Profile and privacy controls</h1>
+              </div>
             </div>
+            <Link
+              to="/orders"
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary-300 hover:text-primary-700"
+            >
+              View orders
+            </Link>
           </div>
 
-          <div className="mt-5 md:mt-0 md:col-span-2">
-            <form onSubmit={handleSubmit}>
-              <div className="shadow sm:rounded-md sm:overflow-hidden">
-                <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-                  <div className="grid grid-cols-3 gap-6">
-                    <div className="col-span-3 sm:col-span-2">
-                      <label htmlFor="names" className="block text-sm font-medium text-gray-700">
-                        Име и фамилия
-                      </label>
-                      <div className="mt-1 flex rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="names"
-                          id="names"
-                          value={formData.names}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          className="flex-1 focus:ring-primary-500 focus:border-primary-500 block w-full min-w-0 rounded-md sm:text-sm border-gray-300 disabled:bg-gray-100"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Имейл адрес
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md disabled:bg-gray-100"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                      Телефонен номер
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        type="tel"
-                        name="phone"
-                        id="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md disabled:bg-gray-100"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                  {!isEditing ? (
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(true)}
-                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                    >
-                      Редактирай
-                    </button>
-                  ) : (
-                    <div className="space-x-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsEditing(false);
-                          // Reset form data to original user data
-                          setFormData({
-                            names: user.name || '',
-                            email: user.email || '',
-                            phone: user.phone || '',
-                          });
-                        }}
-                        className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      >
-                        Отказ
-                      </button>
-                      <button
-                        type="submit"
-                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      >
-                        Запази
-                      </button>
-                    </div>
-                  )}
-                </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            {[
+              { key: "names", label: "Full name", type: "text" },
+              { key: "email", label: "Email", type: "email" },
+              { key: "phone", label: "Phone", type: "tel" },
+            ].map((field) => (
+              <div key={field.key} className={field.key === "names" ? "sm:col-span-2" : ""}>
+                <label htmlFor={field.key} className="block text-sm font-medium text-slate-700">
+                  {field.label}
+                </label>
+                <input
+                  id={field.key}
+                  type={field.type}
+                  value={profile[field.key as keyof ProfileResponse]}
+                  disabled={!isEditing}
+                  onChange={(event) =>
+                    setProfile((previous) => ({
+                      ...previous,
+                      [field.key]: event.target.value,
+                    }))
+                  }
+                  className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                />
               </div>
-            </form>
+            ))}
           </div>
-        </div>
 
-        {/* Order History Section */}
-        <div className="mt-10">
-          <div className="md:grid md:grid-cols-3 md:gap-6">
-            <div className="md:col-span-1">
-              <div className="px-4 sm:px-0">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  История на поръчките
-                </h3>
-                <p className="mt-1 text-sm text-gray-600">
-                  Преглед на вашите предишни поръчки.
-                </p>
-              </div>
+          {(message || error) && (
+            <div className={`mt-6 rounded-2xl px-4 py-3 text-sm ${error ? "border border-rose-200 bg-rose-50 text-rose-700" : "border border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
+              {error ?? message}
             </div>
+          )}
 
-            <div className="mt-5 md:mt-0 md:col-span-2">
-              <div className="shadow overflow-hidden sm:rounded-md">
-                <div className="px-4 py-5 bg-white sm:p-6">
-                  <div className="text-center text-gray-500">
-                    Все още нямате направени поръчки.
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={saveProfile}
+                  className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-600"
+                >
+                  Save changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-600"
+              >
+                Edit profile
+              </button>
+            )}
           </div>
-        </div>
+        </section>
 
-        {/* Account Settings Section */}
-        <div className="mt-10">
-          <div className="md:grid md:grid-cols-3 md:gap-6">
-            <div className="md:col-span-1">
-              <div className="px-4 sm:px-0">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  Настройки на акаунта
-                </h3>
-                <p className="mt-1 text-sm text-gray-600">
-                  Управление на настройките на вашия акаунт.
-                </p>
-              </div>
-            </div>
+        <section className="grid gap-6 lg:grid-cols-2">
+          <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.55)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">GDPR tools</p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-slate-950">Export personal data</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Download the current profile, orders, wishlist references, and reviews the backend exposes for your account.
+            </p>
+            <button
+              type="button"
+              onClick={exportData}
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+              Export my data
+            </button>
+          </article>
 
-            <div className="mt-5 md:mt-0 md:col-span-2">
-              <div className="shadow overflow-hidden sm:rounded-md">
-                <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900">Изтриване на акаунт</h4>
-                    <p className="mt-1 text-sm text-gray-500">
-                      След изтриване на акаунта, всички ваши данни ще бъдат изтрити перманентно.
-                    </p>
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Изтрий акаунт
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          <article className="rounded-[2rem] border border-rose-200 bg-white p-6 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.55)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-rose-600">Account deletion</p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-slate-950">Delete and anonymize account data</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              This action anonymizes profile fields, clears personal delivery details from orders, and removes access to the account.
+            </p>
+            <button
+              type="button"
+              onClick={deleteAccount}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700"
+            >
+              <ExclamationTriangleIcon className="h-4 w-4" />
+              Delete account
+            </button>
+          </article>
+        </section>
       </div>
     </div>
   );
 };
 
-export default Profile; 
+export default Profile;

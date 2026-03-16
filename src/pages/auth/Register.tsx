@@ -1,323 +1,190 @@
-import { useState, useEffect } from "react";
+import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setUser, setToken } from "../../store/slices/authSlice";
 import TermsOfService from "../../components/modals/TermsOfService";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     names: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
-    phone: "",
   });
-  const [error, setError] = useState("");
-  const [showErrorMessage, setShowErrorMessage] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (error) {
-      setShowErrorMessage(true);
-      const hideTimer = setTimeout(() => {
-        setShowErrorMessage(false);
-      }, 4000);
-      const clearTimer = setTimeout(() => {
-        setError("");
-      }, 5000);
-
-      return () => {
-        clearTimeout(hideTimer);
-        clearTimeout(clearTimer);
-      };
-    }
-  }, [error]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (type === "checkbox" && name === "acceptTerms") {
-      setAcceptedTerms(checked);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !formData.names.trim() ||
-      !formData.email.trim() ||
-      !formData.phone.trim() ||
-      !formData.password.trim() ||
-      !formData.confirmPassword.trim()
-    ) {
-      setError("Моля попълнете всички полета");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Моля въведете валиден имейл адрес");
-      return;
-    }
-
-    setError("");
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Въвели сте различни пароли");
+      setError("Passwords do not match.");
       return;
     }
 
     if (!acceptedTerms) {
-      setError("Моля приемете общите условия");
+      setError("You must accept the terms and privacy conditions.");
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
-      const requestBody = {
-        names: formData.names,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          names: formData.names,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
 
-      const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        setError("Неуспешна регистрация");
-        return;
+      if (response.status === 409) {
+        throw new Error("This email is already registered.");
       }
 
       if (!response.ok) {
-        if (response.status === 409) {
-          setError("Имейл адресът вече се използва");
-        } else {
-          setError("Неуспешна регистрация");
-        }
-        return;
+        throw new Error("Registration failed.");
       }
 
-      // Redirect to login page with success message
       navigate("/login", {
         state: {
-          message: "Регистрацията е успешна! Моля, влезте с вашите данни.",
+          message: "Registration completed successfully. You can now sign in.",
         },
       });
-    } catch (err) {
-      console.error("Registration error:", err);
-      setError("Неуспешна регистрация");
+    } catch (requestError) {
+      console.error(requestError);
+      setError(requestError instanceof Error ? requestError.message : "Registration failed.");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-dark-200 p-8 rounded-lg shadow-xl">
-        <div>
-          <h2 className="mt-4 text-center text-3xl font-extrabold text-dark-700">
-            Създаване на акаунт
-          </h2>
-          <p className="mt-2 text-center text-sm text-dark-700">
-            Вече имате акаунт?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-primary-400 hover:text-primary-300"
-            >
-              Влезте тук
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
+      <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Create account</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Register for SportGoods</h1>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          Start browsing, add products to cart, place orders, and manage your data through the new privacy entry points.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           {error && (
-            <div
-              className={` border border-red-500 text-red-400 px-4 py-3 rounded transition-opacity duration-1000 ${
-                showErrorMessage ? "opacity-100" : "opacity-0"
-              }`}
-            >
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
             </div>
           )}
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="names"
-                className="block text-sm font-medium text-dark-700 mb-2"
-              >
-                Имена <span className="text-red-500">*</span>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label htmlFor="names" className="block text-sm font-medium text-slate-700">
+                Full name
               </label>
               <input
                 id="names"
-                name="names"
                 type="text"
-                className="appearance-none relative block w-full px-3 py-2 border border-dark-300 rounded-md bg-dark-300 text-dark-900 placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Въведете имена"
+                required
                 value={formData.names}
-                onChange={handleChange}
+                onChange={(event) => setFormData((previous) => ({ ...previous, names: event.target.value }))}
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-dark-700 mb-2"
-              >
-                Имейл адрес <span className="text-red-500">*</span>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                Email
               </label>
               <input
                 id="email"
-                name="email"
-                type="text"
-                autoComplete="email"
-                className="appearance-none relative block w-full px-3 py-2 border border-dark-300 rounded-md bg-dark-300 text-dark-900 placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Въведете имейл адрес"
+                type="email"
+                required
                 value={formData.email}
-                onChange={handleChange}
+                onChange={(event) => setFormData((previous) => ({ ...previous, email: event.target.value }))}
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-dark-700 mb-2"
-              >
-                Телефонен номер <span className="text-red-500">*</span>
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+                Phone
               </label>
               <input
                 id="phone"
-                name="phone"
-                type="text"
-                autoComplete="phone"
-                className="appearance-none relative block w-full px-3 py-2 border border-dark-300 rounded-md bg-dark-300 text-dark-900 placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Въведете телефонен номер"
+                type="tel"
+                required
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={(event) => setFormData((previous) => ({ ...previous, phone: event.target.value }))}
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-dark-700 mb-2"
-              >
-                Парола <span className="text-red-500">*</span>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                Password
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="new-password"
-                className="appearance-none relative block w-full px-3 py-2 border border-dark-300 rounded-md bg-dark-300 text-dark-900 placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Въведете парола"
+                required
                 value={formData.password}
-                onChange={handleChange}
+                onChange={(event) => setFormData((previous) => ({ ...previous, password: event.target.value }))}
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
+
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-dark-700 mb-2"
-              >
-                Потвърдете паролата <span className="text-red-500">*</span>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700">
+                Confirm password
               </label>
               <input
                 id="confirmPassword"
-                name="confirmPassword"
                 type="password"
-                autoComplete="new-password"
-                className="appearance-none relative block w-full px-3 py-2 border border-dark-300 rounded-md bg-dark-300 text-dark-900 placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Въведете паролата отново"
+                required
                 value={formData.confirmPassword}
-                onChange={handleChange}
+                onChange={(event) => setFormData((previous) => ({ ...previous, confirmPassword: event.target.value }))}
+                className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
           </div>
 
-          <div className="flex items-center">
+          <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
             <input
-              id="acceptTerms"
-              name="acceptTerms"
               type="checkbox"
-              className="peer hidden"
               checked={acceptedTerms}
-              onChange={handleChange}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
             />
-            <label
-              htmlFor="acceptTerms"
-              className="h-5 w-5 border border-dark-300 rounded bg-dark-300 text-white peer-checked:bg-red-500  peer-checked:border-transparent cursor-pointer flex items-center justify-center"
-            >
-              ✓
-            </label>
-            <span className="ml-2 block text-sm text-dark-700">
-              Прочетох и приемам{" "}
-              <span
-                onClick={() => setIsTermsOpen(true)}
-                className="font-medium text-primary-400 hover:text-primary-300 cursor-pointer"
-              >
-                общите условия
-              </span>
+            <span>
+              I agree with the terms of service and consent to the handling of my personal data for account and order processing.
+              <button type="button" onClick={() => setIsTermsOpen(true)} className="ml-1 font-semibold text-primary-600">
+                Read terms
+              </button>
             </span>
-          </div>
+          </label>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-dark-900 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Регистрация...
-                </span>
-              ) : (
-                "Регистрация"
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isSubmitting ? "Creating account..." : "Register"}
+          </button>
         </form>
+
+        <p className="mt-6 text-sm text-slate-500">
+          Already registered? <Link to="/login" className="font-semibold text-primary-600">Login</Link>
+        </p>
       </div>
-      <TermsOfService
-        isOpen={isTermsOpen}
-        onClose={() => setIsTermsOpen(false)}
-      />
+
+      <TermsOfService isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
     </div>
   );
 };

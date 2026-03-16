@@ -1,319 +1,249 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { FormEvent, useMemo, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  Bars3Icon,
+  MagnifyingGlassIcon,
+  ShoppingBagIcon,
+  UserCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { RootState } from "../../store";
-import { logout, setUser } from "../../store/slices/authSlice";
-import { ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { logout } from "../../store/slices/authSlice";
 import { decodeJWT } from "../../utils/jwtUtils";
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
+const navItems = [
+  { to: "/", label: "Home" },
+  { to: "/store", label: "Store" },
+  { to: "/about", label: "About Us" },
+];
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, user, token } = useSelector(
-    (state: RootState) => state.auth
-  );
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, token, user } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    if (token) {
-      const decodedToken = decodeJWT(token);
-      console.log("Decoded token in Navbar:", decodedToken);
-
-      // Check for admin role in the token claims
-      const role =
-        decodedToken?.[
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ];
-      console.log("Role from token:", role);
-
-      const isAdminUser = role === "Admin";
-      console.log("Is admin user:", isAdminUser);
-
-      setIsAdmin(isAdminUser);
-    } else {
-      setIsAdmin(false);
-    }
+  const isAdmin = useMemo(() => {
+    const decodedToken = decodeJWT(token);
+    return (
+      decodedToken?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] === "Admin"
+    );
   }, [token]);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("https://sportgoods-api.onrender.com/api/Auth/logout", {
+      await fetch(`${import.meta.env.VITE_API_URL}/Auth/logout`, {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-
-      setIsOpen(false);
-      dispatch(logout());
-      navigate("/");
     } catch (error) {
-      console.error('Error during logout:', error);
-      // Still logout locally even if the API call fails
+      console.error("Logout request failed:", error);
+    } finally {
       dispatch(logout());
-      setIsOpen(false);
       navigate("/");
     }
   };
 
-  const getUserInitial = () => {
-    if (!user?.name) return "?";
-    return user.name.charAt(0).toUpperCase();
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleMobileMenuClick = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    const params = trimmedQuery ? `?search=${encodeURIComponent(trimmedQuery)}` : "";
+    navigate(`/products${params}`);
+    setIsMenuOpen(false);
   };
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-primary-600">
-                SportGoods
-              </span>
-            </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                to="/products"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                Продукти
-              </Link>
-              {isAuthenticated && (
-                <>
-                  <Link
-                    to="/wishlist"
-                    className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  >
-                    Любими
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin/products"
-                      className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                    >
-                      Админ панел
-                    </Link>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((previous) => !previous)}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 text-slate-600 transition hover:border-primary-300 hover:text-primary-600 md:hidden"
+        >
+          {isMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+        </button>
 
-          {/* Mobile menu button */}
-          <div className="flex items-center sm:hidden">
-            <button
-              onClick={handleMobileMenuClick}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+        <Link to="/" className="flex min-w-fit items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.9)]">
+            SG
+          </div>
+          <div>
+            <p className="font-display text-lg font-bold tracking-tight text-slate-950">SportGoods</p>
+            <p className="text-xs text-slate-500">Performance gear for every session</p>
+          </div>
+        </Link>
+
+        <nav className="hidden items-center gap-2 md:flex">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `rounded-full px-4 py-2 text-sm font-medium transition ${
+                  isActive
+                    ? "bg-slate-100 text-slate-950"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                }`
+              }
             >
-              <span className="sr-only">Open main menu</span>
-              {isMobileMenuOpen ? (
-                <XMarkIcon className="block h-6 w-6" />
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
-            </button>
-          </div>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
 
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <div className="ml-auto mr-4"></div>
-            {isAuthenticated && (
-              <Link
-                to="/cart"
-                className="inline-flex items-center justify-center mr-3 p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                <ShoppingCartIcon className="h-6 w-6" />
-              </Link>
-            )}
-            {isAuthenticated ? (
-              <div className="ml-3 relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    src="https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
-                    alt="Profile"
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                </button>
-                {isOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
-                    <div className="py-1">
-                      <Link
-                        to="/orders"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Моите поръчки
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-100 hover:text-gray-700"
-                      >
-                        Изход
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="ml-3 flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Вход
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 hover:text-gray-300"
-                >
-                  Регистрация
-                </Link>
-              </div>
-            )}
+        <form onSubmit={handleSearchSubmit} className="hidden flex-1 md:block">
+          <div className="relative mx-auto max-w-xl">
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search products, categories, gear..."
+              className="h-12 w-full rounded-full border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+            />
           </div>
-        </div>
-      </div>
+        </form>
 
-      <div className={`sm:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
-        <div className="pt-2 pb-3 space-y-1">
-          <Link
-            to="/products"
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Продукти
-          </Link>
-          {isAuthenticated && (
+        <div className="ml-auto hidden items-center gap-2 md:flex">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                location.pathname.startsWith("/admin")
+                  ? "border-primary-500 bg-primary-50 text-primary-700"
+                  : "border-slate-200 text-slate-600 hover:border-primary-300 hover:text-primary-700"
+              }`}
+            >
+              Admin
+            </Link>
+          )}
+
+          {isAuthenticated ? (
             <>
               <Link
-                to="/wishlist"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Любими
-              </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin/products"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Админ панел
-                </Link>
-              )}
-              <Link
                 to="/cart"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                onClick={() => setIsMobileMenuOpen(false)}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-primary-300 hover:text-primary-600"
               >
-                Количка
+                <ShoppingBagIcon className="h-5 w-5" />
+              </Link>
+              <Link
+                to="/profile"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-primary-300 hover:text-primary-600"
+              >
+                <UserCircleIcon className="h-6 w-6" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950">
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
+              >
+                Register
               </Link>
             </>
           )}
         </div>
-        <div className="pt-4 pb-3 border-t border-gray-200">
-          {isAuthenticated ? (
-            <div className="flex items-center px-5">
-              <div className="flex-shrink-0">
-                <img
-                  src="https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
-                  alt="Profile"
-                  className="h-10 w-10 rounded-full"
-                />
-              </div>
-              <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">
-                  {user?.name}
-                </div>
-                <div className="text-sm font-medium text-gray-500">
-                  {user?.email}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <Link
-                to="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Вход
-              </Link>
-              <Link
-                to="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Регистрация
-              </Link>
-            </div>
-          )}
-          {isAuthenticated && (
-            <div className="mt-3 space-y-1">
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-              >
-                Изход
-              </button>
-            </div>
-          )}
-        </div>
       </div>
-    </nav>
+
+      {isMenuOpen && (
+        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden">
+          <form onSubmit={handleSearchSubmit} className="mb-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search products..."
+                className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+              />
+            </div>
+          </form>
+
+          <div className="space-y-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setIsMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                    isActive
+                      ? "bg-slate-100 text-slate-950"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-2">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setIsMenuOpen(false)}
+                className="rounded-2xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm font-medium text-primary-700"
+              >
+                Open admin dashboard
+              </Link>
+            )}
+
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/cart"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700"
+                >
+                  Cart
+                </Link>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700"
+                >
+                  {user?.name ?? "Profile"}
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-2xl bg-slate-950 px-4 py-3 text-left text-sm font-medium text-white"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setIsMenuOpen(false)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
+                  Login
+                </Link>
+                <Link to="/register" onClick={() => setIsMenuOpen(false)} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
 

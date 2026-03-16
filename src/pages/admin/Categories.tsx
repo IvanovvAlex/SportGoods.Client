@@ -40,7 +40,7 @@ const AdminCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://sportgoods-api.onrender.com/api/Categories', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Categories`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -114,7 +114,7 @@ const AdminCategories = () => {
     }
 
     try {
-      const url = `https://sportgoods-api.onrender.com/api/Categories/`
+      const url = `${import.meta.env.VITE_API_URL}/Categories/`
       
       const response = await fetch(url, {
         method: editingCategory ? "PUT" : "POST",
@@ -173,7 +173,7 @@ const AdminCategories = () => {
     if (!categoryToDelete) return;
 
     try {
-      const response = await fetch(`https://sportgoods-api.onrender.com/api/Categories/${categoryToDelete.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Categories/${categoryToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

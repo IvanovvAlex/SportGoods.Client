@@ -1,6 +1,8 @@
 # Step 1: Build
 FROM node:20 AS build
 WORKDIR /app
+ARG VITE_API_URL=http://localhost:5192/api
+ENV VITE_API_URL=$VITE_API_URL
 COPY . .
 RUN npm install
 RUN npm run build

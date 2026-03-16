@@ -1,11 +1,9 @@
-import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addItem } from "../../store/slices/cartSlice";
-import { ShoppingCartIcon, StarIcon } from "@heroicons/react/24/solid";
-import { RootState } from "../../store";
+import { ShoppingBagIcon, StarIcon } from "@heroicons/react/24/solid";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { addItem } from "../../store/slices/cartSlice";
+import { RootState } from "../../store";
 
 interface Product {
   id: string;
@@ -24,52 +22,35 @@ interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.auth.token);
-  const navigate = useNavigate();
-  const location = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToCart = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
 
     if (!user) {
-      toast.error(
-        "Моля, влезте в акаунта си, за да добавите продукт в количката.",
-        {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
+      toast.error("Please sign in before adding products to your cart.");
       return;
     }
 
     try {
-      const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Orders`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            productId: product.id,
-            quantity: 1,
-          }),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/Orders`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity: 1,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to add product to cart");
+        throw new Error("Unable to add product to cart.");
       }
 
       dispatch(
@@ -78,138 +59,93 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           title: product.title,
           regularPrice: product.regularPrice,
           quantity: 1,
-          imageUrl: product.mainImageUrl || "",
+          imageUrl: product.mainImageUrl,
           mainImageUrl: product.mainImageUrl,
           discountPercentage: product.discountPercentage,
           discountedPrice: product.discountedPrice,
         })
       );
 
-      toast.success("Продуктът беше добавен в количката", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast.success("Product added to cart.");
     } catch (error) {
-      console.error("Error adding product to cart:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Възникна грешка при добавянето на продукта",
-        {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
+      console.error(error);
+      toast.error("Unable to add the selected product.");
     }
   };
 
-  const displayPrice = (price: number | undefined) => {
-    if (price === undefined) return "0.00";
-    return price.toFixed(2) + " лв.";
-  };
+  const displayPrice = product.discountedPrice && product.discountedPrice > 0 ? product.discountedPrice : product.regularPrice;
+  const isLowStock = product.quantity > 0 && product.quantity <= 10;
 
   return (
-    <Link to={`/products/${product.id}`} className="block">
-      <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-[410px]">
-        {/* Product Image */}
-        <div className="h-48 w-full overflow-hidden bg-gray-200">
+    <Link to={`/products/${product.id}`} className="group block h-full">
+      <article className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_28px_90px_-60px_rgba(15,23,42,0.55)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_32px_90px_-50px_rgba(15,23,42,0.65)]">
+        <div className="relative overflow-hidden">
           <img
             src={product.mainImageUrl || "/placeholder-image.jpg"}
             alt={product.title}
-            className="h-full w-full object-cover object-center group-hover:opacity-75 transition-opacity duration-300"
+            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
           />
+          {product.discountPercentage ? (
+            <span className="absolute left-4 top-4 rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-white">
+              -{product.discountPercentage}%
+            </span>
+          ) : null}
+          <span
+            className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-semibold ${
+              product.quantity === 0
+                ? "bg-rose-100 text-rose-700"
+                : isLowStock
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-emerald-100 text-emerald-700"
+            }`}
+          >
+            {product.quantity === 0 ? "Out of stock" : isLowStock ? "Low stock" : "In stock"}
+          </span>
         </div>
 
-        {/* Product Info */}
-        <div className="p-4 flex flex-col justify-between h-[calc(100%-12rem)]">
-          {/* Title */}
-          <div className="h-12">
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-              {product.title}
-            </h3>
-          </div>
-
-          {/* Content Section */}
-          <div className="flex flex-col justify-between flex-1">
-            <div className="space-y-2">
-              {/* Rating */}
-              <div className="flex items-center">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`h-4 w-4 ${
-                        i < Math.round(product.rating || 0)
-                          ? "text-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="ml-1 text-sm text-gray-600">
-                  ({product.rating?.toFixed(1) || "0.0"})
-                </span>
-              </div>
-
-              {/* Price and Availability */}
-              {product.discountPercentage ? (
-                <div className="flex items-center space-x-2">
-                  <p className="text-lg font-bold text-primary-600">
-                    {product.discountedPrice?.toFixed(2)} лв.
-                  </p>
-                  <span className="bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-xs">
-                    -{product.discountPercentage}%
-                  </span>
-                </div>
-              ) : (
-                <p className="text-lg font-bold text-gray-900">
-                  {product.regularPrice.toFixed(2)} лв.
-                </p>
-              )}
-              <div className="flex items-center">
-                <div
-                  className={`h-2 w-2 rounded-full mr-2 ${
-                    product.quantity > 0 ? "bg-green-500" : "bg-red-500"
-                  }`}
-                ></div>
-                <span
-                  className={`text-sm ${
-                    product.quantity > 0 ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {product.quantity > 0 ? "В наличност" : "Няма в наличност"}
-                </span>
-              </div>
+        <div className="flex flex-1 flex-col p-5">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+              Product
+            </p>
+            <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+              <StarIcon className="h-3.5 w-3.5" />
+              {(product.rating ?? 0).toFixed(1)}
             </div>
-
-            {/* Add to Cart Button */}
-            <button
-              onClick={handleAddToCart}
-              className={`w-full h-12 flex items-center justify-center rounded-md mt-4 ${
-                product.quantity === 0
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-primary-600 text-white hover:bg-primary-700"
-              }`}
-              disabled={product.quantity === 0}
-            >
-              <ShoppingCartIcon className="h-5 w-5 mr-2" />
-              {product.quantity === 0 ? "Няма в наличност" : "Добави в количка"}
-            </button>
           </div>
+
+          <h3 className="mt-4 font-display text-xl font-semibold leading-tight text-slate-950 line-clamp-2">
+            {product.title}
+          </h3>
+          <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
+            {product.description.replace(/<[^>]+>/g, " ")}
+          </p>
+
+          <div className="mt-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="font-display text-2xl font-bold text-slate-950">{displayPrice.toFixed(2)} лв.</p>
+              {product.discountedPrice && product.discountedPrice > 0 ? (
+                <p className="mt-1 text-sm text-slate-400 line-through">{product.regularPrice.toFixed(2)} лв.</p>
+              ) : null}
+            </div>
+            <span className="text-xs text-slate-500">{product.quantity} available</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={product.quantity === 0}
+            className={`mt-6 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              product.quantity === 0
+                ? "cursor-not-allowed bg-slate-100 text-slate-400"
+                : "bg-slate-950 text-white hover:bg-primary-600"
+            }`}
+          >
+            <ShoppingBagIcon className="h-5 w-5" />
+            {product.quantity === 0 ? "Unavailable" : "Add to cart"}
+          </button>
         </div>
-      </div>
+      </article>
     </Link>
   );
 };

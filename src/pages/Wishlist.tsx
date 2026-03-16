@@ -32,7 +32,7 @@ const Wishlist = () => {
         const products = await Promise.all(
           wishlist.map(async (productId) => {
             const response = await fetch(
-              `https://sportgoods-api.onrender.com/api/Products/${productId}`,
+              `${import.meta.env.VITE_API_URL}/Products/${productId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

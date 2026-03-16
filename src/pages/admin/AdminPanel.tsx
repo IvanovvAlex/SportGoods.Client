@@ -1,50 +1,57 @@
-import { Link, Outlet, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { ChartBarSquareIcon, CubeIcon, QueueListIcon, Squares2X2Icon, UsersIcon } from "@heroicons/react/24/outline";
+import { Navigate, NavLink, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+
+const navigation = [
+  { to: "/admin", label: "Overview", icon: Squares2X2Icon, end: true },
+  { to: "/admin/orders", label: "Orders", icon: QueueListIcon },
+  { to: "/admin/products", label: "Products", icon: CubeIcon },
+  { to: "/admin/categories", label: "Categories", icon: ChartBarSquareIcon },
+  { to: "/admin/users", label: "Users", icon: UsersIcon },
+];
 
 const AdminPanel = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  console.log('Current user:', user); // Debug log
 
-  // Redirect non-admin users to home page
   if (user?.role !== "Admin") {
     return <Navigate to="/" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <aside className="w-64 min-h-screen bg-secondary-900 text-white p-4">
-          <h2 className="text-xl font-bold mb-6">Административен панел</h2>
-          <nav className="space-y-2">
-            <Link 
-              to="/admin/products" 
-              className="block px-4 py-2 rounded hover:bg-secondary-800 transition-colors"
-            >
-              Продукти
-            </Link>
-            <Link 
-              to="/admin/orders" 
-              className="block px-4 py-2 rounded hover:bg-secondary-800 transition-colors"
-            >
-              Поръчки
-            </Link>
-            <Link 
-              to="/admin/categories" 
-              className="block px-4 py-2 rounded hover:bg-secondary-800 transition-colors"
-            >
-              Категории
-            </Link>
-            <Link 
-              to="/admin/users" 
-              className="block px-4 py-2 rounded hover:bg-secondary-800 transition-colors"
-            >
-              Потребители
-            </Link>
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-100">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-[1600px] lg:grid-cols-[280px_1fr]">
+        <aside className="border-r border-slate-200 bg-slate-950 px-6 py-8 text-slate-100">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary-300">Admin workspace</p>
+            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight">SportGoods dashboard</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Track orders, inventory, low-stock warnings, and management actions from a single analytics-style shell.
+            </p>
+          </div>
+
+          <nav className="mt-10 space-y-2">
+            {navigation.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                    isActive
+                      ? "bg-white text-slate-950 shadow-[0_25px_60px_-40px_rgba(255,255,255,0.9)]"
+                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                  }`
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
         </aside>
 
-        <main className="flex-1 p-8">
+        <main className="px-4 py-6 sm:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>
@@ -52,4 +59,4 @@ const AdminPanel = () => {
   );
 };
 
-export default AdminPanel; 
+export default AdminPanel;

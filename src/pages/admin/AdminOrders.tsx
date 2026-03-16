@@ -66,7 +66,7 @@ const AdminOrders = () => {
       });
 
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Orders/get-list?${queryParams.toString()}`,
+        `${import.meta.env.VITE_API_URL}/Orders/get-list?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ const AdminOrders = () => {
   const handleStatusChange = async (orderId: string, newStatus: number) => {
     try {
       const response = await fetch(
-        `https://sportgoods-api.onrender.com/api/Orders/change-status`,
+        `${import.meta.env.VITE_API_URL}/Orders/change-status`,
         {
           method: "PUT",
           headers: {

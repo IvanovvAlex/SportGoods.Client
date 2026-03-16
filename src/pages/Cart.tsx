@@ -39,7 +39,7 @@ const Cart = () => {
   const fetchCartItems = async () => {
     try {
       const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Orders/",
+        `${import.meta.env.VITE_API_URL}/Orders/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ const Cart = () => {
 
         // Make API request
         if (newQuantity < item.quantity) {
-          await fetch("https://sportgoods-api.onrender.com/api/Orders/", {
+          await fetch(`${import.meta.env.VITE_API_URL}/Orders/`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -101,7 +101,7 @@ const Cart = () => {
             }),
           });
         } else {
-          await fetch("https://sportgoods-api.onrender.com/api/Orders", {
+          await fetch(`${import.meta.env.VITE_API_URL}/Orders`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -142,7 +142,7 @@ const Cart = () => {
       if (!item) return;
 
       const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Orders/",
+        `${import.meta.env.VITE_API_URL}/Orders/`,
         {
           method: "DELETE",
           headers: {
@@ -189,7 +189,7 @@ const Cart = () => {
   const handleClearCart = async () => {
     try {
       const response = await fetch(
-        "https://sportgoods-api.onrender.com/api/Orders/",
+        `${import.meta.env.VITE_API_URL}/Orders/`,
         {
           method: "DELETE",
           headers: {
