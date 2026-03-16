@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addItem } from "../store/slices/cartSlice";
 import { addToWishlist, removeFromWishlist } from "../store/slices/userSlice";
 import {
   StarIcon,
@@ -39,22 +38,6 @@ interface Product {
   }>;
   discountPercentage?: number;
   discountedPrice?: number;
-}
-
-interface Review {
-  id: string;
-  userId: string;
-  userName: string;
-  rating: number;
-  content: string;
-  date: string;
-  productId: string;
-}
-
-// Add these interfaces for the API response
-interface ReviewResponse {
-  items: ReviewItem[];
-  totalCount: number;
 }
 
 interface ReviewItem {
@@ -112,9 +95,8 @@ const ProductDetails = () => {
   const [newReviewRating, setNewReviewRating] = useState(0);
   const [newReviewComment, setNewReviewComment] = useState("");
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [totalReviews, setTotalReviews] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState<string>("createdOn");
   const [sortDescending, setSortDescending] = useState(true);
@@ -133,12 +115,12 @@ const ProductDetails = () => {
           `${import.meta.env.VITE_API_URL}/Products/${id}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch product");
+          throw new Error("We could not load this product.");
         }
         const data = await response.json();
         setProduct(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : "We could not load this product.");
       } finally {
         setLoading(false);
       }
@@ -172,7 +154,7 @@ const ProductDetails = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch reviews");
+        throw new Error("We could not load the reviews.");
       }
 
       const data = await response.json();
@@ -185,7 +167,7 @@ const ProductDetails = () => {
       setTotalPages(Math.ceil(data.totalCount / pageSize));
     } catch (error) {
       console.error("Error fetching reviews:", error);
-      toast.error("Възникна грешка при зареждането на отзивите");
+      toast.error("We could not load the reviews.");
     }
   };
 
@@ -196,7 +178,7 @@ const ProductDetails = () => {
   const handleAddToCart = async () => {
     if (!token) {
       toast.error(
-        "Моля, влезте в акаунта си, за да добавите продукт в количката.",
+        "Sign in to add this product to your cart.",
         {
           position: "bottom-right",
           autoClose: 3000,
@@ -233,7 +215,7 @@ const ProductDetails = () => {
         throw new Error("Failed to add product to cart");
       }
 
-      toast.success("Продуктът беше добавен в количката", {
+      toast.success("Product added to cart.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -245,7 +227,7 @@ const ProductDetails = () => {
       });
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      toast.error("Възникна грешка при добавянето на продукта в количката", {
+      toast.error("We could not add this product to your cart.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -273,7 +255,7 @@ const ProductDetails = () => {
 
     if (isInWishlist) {
       dispatch(removeFromWishlist(product.id));
-      toast.info("Продуктът беше премахнат от списъка с желания", {
+      toast.info("Removed from wishlist.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -285,7 +267,7 @@ const ProductDetails = () => {
       });
     } else {
       dispatch(addToWishlist(product.id));
-      toast.success("Продуктът беше добавен в списъка с желания", {
+      toast.success("Added to wishlist.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -319,8 +301,6 @@ const ProductDetails = () => {
           }),
         }
       );
-      console.log(product.id, newReviewComment, newReviewRating);
-
       if (!response.ok) {
         throw new Error("Failed to submit review");
       }
@@ -332,7 +312,7 @@ const ProductDetails = () => {
       // Fetch updated reviews using the existing function
       await fetchReviews();
 
-      toast.success("Благодарим за вашия отзив!", {
+      toast.success("Thanks for sharing your review.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -342,8 +322,8 @@ const ProductDetails = () => {
         progress: undefined,
         theme: "light",
       });
-    } catch (error) {
-      toast.error("Възникна грешка при публикуването на отзива", {
+    } catch {
+      toast.error("We could not publish your review.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -360,7 +340,7 @@ const ProductDetails = () => {
     const DeleteConfirmationToast = () => (
       <div className="p-4">
         <p className="text-gray-700 mb-4">
-          Сигурни ли сте, че искате да изтриете този отзив?
+          Delete this review?
         </p>
         <div className="flex justify-end space-x-2">
           <button
@@ -370,13 +350,13 @@ const ProductDetails = () => {
             }}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
-            Да, изтрий
+            Delete review
           </button>
           <button
             onClick={() => toast.dismiss()}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
           >
-            Отказ
+            Cancel
           </button>
         </div>
       </div>
@@ -402,10 +382,10 @@ const ProductDetails = () => {
           throw new Error("Failed to delete review");
         }
 
-        toast.success("Отзивът беше изтрит успешно");
+        toast.success("Review deleted.");
         fetchReviews(); // Refresh the reviews list
-      } catch (error) {
-        toast.error("Възникна грешка при изтриването на отзива");
+      } catch {
+        toast.error("We could not delete this review.");
       }
     };
 
@@ -441,11 +421,11 @@ const ProductDetails = () => {
         throw new Error("Failed to update review");
       }
 
-      toast.success("Отзивът беше обновен успешно");
+      toast.success("Review updated.");
       setEditingReviewId(null);
       fetchReviews(); // Refresh the reviews list
-    } catch (error) {
-      toast.error("Възникна грешка при обновяването на отзива");
+    } catch {
+      toast.error("We could not update this review.");
     }
   };
 
@@ -458,7 +438,7 @@ const ProductDetails = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <div className="text-lg">Зареждане...</div>
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
@@ -467,7 +447,7 @@ const ProductDetails = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-lg text-red-600">
-          {error || "Продуктът не е намерен"}
+          {error || "Product not found"}
         </div>
       </div>
     );
@@ -612,11 +592,11 @@ const ProductDetails = () => {
               </div>
               <span className="text-sm text-gray-600">
                 {product.rating
-                  ? `${product.rating.toFixed(1)} от 5`
-                  : "Все още няма рейтинг"}
+                  ? `${product.rating.toFixed(1)} out of 5`
+                  : "No rating yet"}
                 {reviews.length > 0 &&
                   ` (${reviews.length} ${
-                    reviews.length === 1 ? "отзив" : "отзива"
+                    reviews.length === 1 ? "review" : "reviews"
                   })`}
               </span>
             </div>
@@ -626,10 +606,10 @@ const ProductDetails = () => {
               {product.discountPercentage ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-2xl font-bold text-primary-600">
-                    {product.discountedPrice?.toFixed(2)} лв.
+                    {product.discountedPrice?.toFixed(2)} BGN
                   </span>
                   <span className="text-lg text-gray-500 line-through">
-                    {product.regularPrice.toFixed(2)} лв.
+                    {product.regularPrice.toFixed(2)} BGN
                   </span>
                   <span className="bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-sm">
                     -{product.discountPercentage}%
@@ -637,7 +617,7 @@ const ProductDetails = () => {
                 </div>
               ) : (
                 <span className="text-2xl font-bold text-primary-600">
-                  {product.regularPrice.toFixed(2)} лв.
+                  {product.regularPrice.toFixed(2)} BGN
                 </span>
               )}
             </div>
@@ -646,7 +626,7 @@ const ProductDetails = () => {
             <div className="space-y-3 border-t border-b py-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">
-                  Статус:
+                  Availability:
                 </span>
                 <div className="flex items-center">
                   <div
@@ -671,14 +651,14 @@ const ProductDetails = () => {
                         : "text-gray-600"
                     }`}
                   >
-                    {product.quantity > 0 ? "В наличност" : "Изчерпан"}
+                    {product.quantity > 0 ? "In stock" : "Out of stock"}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">
-                  Количество в склада:
+                  Units available:
                 </span>
                 <span
                   className={`text-sm font-medium ${
@@ -689,7 +669,7 @@ const ProductDetails = () => {
                       : "text-red-700"
                   }`}
                 >
-                  {product.quantity} бр.
+                  {product.quantity} pcs
                 </span>
               </div>
             </div>
@@ -706,7 +686,7 @@ const ProductDetails = () => {
                   htmlFor="quantity"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Избери количество:
+                  Quantity:
                 </label>
                 <div className="flex items-center border rounded-md">
                   <button
@@ -743,7 +723,7 @@ const ProductDetails = () => {
                   </button>
                 </div>
                 <span className="text-sm text-gray-500">
-                  (Максимум: {product.quantity} бр.)
+                  (Maximum: {product.quantity} pcs)
                 </span>
               </div>
             )}
@@ -759,7 +739,7 @@ const ProductDetails = () => {
                 }`}
                 disabled={product.quantity === 0}
               >
-                {product.quantity > 0 ? "Добави в количка" : "Изчерпан"}
+                {product.quantity > 0 ? "Add to cart" : "Out of stock"}
               </button>
               {token && (
                 <button
@@ -767,8 +747,8 @@ const ProductDetails = () => {
                   className="p-3 border rounded-md bg-gray-100 hover:bg-primary-100 transition-colors"
                   title={
                     isInWishlist
-                      ? "Премахни от списъка с желания"
-                      : "Добави в списъка с желания"
+                      ? "Remove from wishlist"
+                      : "Add to wishlist"
                   }
                 >
                   {isInWishlist ? (
@@ -785,17 +765,17 @@ const ProductDetails = () => {
         {/* Reviews Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Отзиви на клиенти
+            Customer reviews
           </h2>
 
           {/* Add Review Form */}
           {token ? (
             <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
-              <h3 className="text-lg font-semibold mb-4">Добави отзив</h3>
+              <h3 className="text-lg font-semibold mb-4">Write a review</h3>
               <form onSubmit={handleReviewSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Рейтинг
+                    Rating
                   </label>
                   <div className="flex space-x-1">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -818,14 +798,14 @@ const ProductDetails = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     {newReviewRating
                       ? `${newReviewRating} ${
-                          newReviewRating === 1 ? "звезда" : "звезди"
+                          newReviewRating === 1 ? "star" : "stars"
                         }`
-                      : "Изберете рейтинг"}
+                      : "Choose a rating"}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Коментар
+                    Comment
                   </label>
                   <div className="relative border rounded-md">
                     <ReactQuill
@@ -834,7 +814,7 @@ const ProductDetails = () => {
                       modules={quillModules}
                       formats={quillFormats}
                       theme="snow"
-                      placeholder="Споделете вашето мнение за продукта..."
+                      placeholder="Share your experience with this product..."
                     />
                   </div>
                 </div>
@@ -846,7 +826,7 @@ const ProductDetails = () => {
                     className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors"
                     disabled={!newReviewRating || !newReviewComment.trim()}
                   >
-                    Публикувай отзив
+                    Publish review
                   </button>
                 </div>
               </form>
@@ -854,11 +834,11 @@ const ProductDetails = () => {
           ) : (
             <div className="bg-gray-50 p-4 rounded-lg mb-8">
               <p className="text-gray-600">
-                Моля{" "}
+                Please{" "}
                 <Link to="/login" className="text-primary-600 hover:underline">
-                  влезте в профила си
+                  sign in
                 </Link>{" "}
-                за да публикувате отзив.
+                to leave a review.
               </p>
             </div>
           )}
@@ -867,7 +847,7 @@ const ProductDetails = () => {
           <div className="mt-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                Отзиви от клиенти
+                All reviews
               </h2>
               <div className="flex items-center space-x-4">
                 {/* Sorting Controls */}
@@ -876,14 +856,14 @@ const ProductDetails = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="rounded-md border-gray-300 text-sm"
                 >
-                  <option value="createdOn">По дата</option>
-                  <option value="rating">По рейтинг</option>
+                  <option value="createdOn">Newest</option>
+                  <option value="rating">Highest rated</option>
                 </select>
                 <button
                   onClick={() => setSortDescending(!sortDescending)}
                   className="p-2 hover:bg-gray-100 rounded-md"
                 >
-                  {sortDescending ? "↓ Низходящо" : "↑ Възходящо"}
+                  {sortDescending ? "↓ Descending" : "↑ Ascending"}
                 </button>
               </div>
             </div>
@@ -907,7 +887,7 @@ const ProductDetails = () => {
                         >
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Рейтинг
+                              Rating
                             </label>
                             <div className="flex space-x-2">
                               {[1, 2, 3, 4, 5].map((star) => (
@@ -930,7 +910,7 @@ const ProductDetails = () => {
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Коментар
+                              Comment
                             </label>
                             <div className="relative border rounded-md">
                               <ReactQuill
@@ -948,14 +928,14 @@ const ProductDetails = () => {
                               type="submit"
                               className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors"
                             >
-                              Запази
+                              Save
                             </button>
                             <button
                               type="button"
                               onClick={() => setEditingReviewId(null)}
                               className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
                             >
-                              Отказ
+                              Cancel
                             </button>
                           </div>
                         </form>
@@ -982,7 +962,7 @@ const ProductDetails = () => {
                                 <span className="text-sm text-gray-500">
                                   {new Date(
                                     review.createdOn
-                                  ).toLocaleDateString("bg-BG", {
+                                  ).toLocaleDateString("en-GB", {
                                     year: "numeric",
                                     month: "long",
                                     day: "numeric",
@@ -998,7 +978,7 @@ const ProductDetails = () => {
                                   <button
                                     onClick={() => startEditing(review)}
                                     className="text-white hover:text-white p-1"
-                                    title="Редактирай"
+                                    title="Edit"
                                   >
                                     <PencilIcon className="h-5 w-5" />
                                   </button>
@@ -1007,7 +987,7 @@ const ProductDetails = () => {
                                       handleDeleteReview(review.id)
                                     }
                                     className="text-white hover:text-white p-1"
-                                    title="Изтрий"
+                                    title="Delete"
                                   >
                                     <TrashIcon className="h-5 w-5" />
                                   </button>
@@ -1092,11 +1072,11 @@ const ProductDetails = () => {
             ) : (
               <div className="bg-gray-50 rounded-lg p-6 text-center">
                 <p className="text-gray-600">
-                  Все още няма отзиви за този продукт.
+                  There are no reviews for this product yet.
                 </p>
                 {token && (
                   <p className="text-gray-600 mt-2">
-                    Бъдете първият, който ще сподели мнение за този продукт!
+                    Be the first customer to share feedback.
                   </p>
                 )}
               </div>

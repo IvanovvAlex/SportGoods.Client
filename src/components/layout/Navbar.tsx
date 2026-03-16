@@ -14,8 +14,8 @@ import { decodeJWT } from "../../utils/jwtUtils";
 
 const navItems = [
   { to: "/", label: "Home" },
-  { to: "/store", label: "Store" },
-  { to: "/about", label: "About Us" },
+  { to: "/products", label: "Shop" },
+  { to: "/about", label: "About" },
 ];
 
 const Navbar = () => {
@@ -74,7 +74,7 @@ const Navbar = () => {
           </div>
           <div>
             <p className="font-display text-lg font-bold tracking-tight text-slate-950">SportGoods</p>
-            <p className="text-xs text-slate-500">Performance gear for every session</p>
+            <p className="text-xs text-slate-500">Gear for training days and match days</p>
           </div>
         </Link>
 
@@ -103,7 +103,7 @@ const Navbar = () => {
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search products, categories, gear..."
+              placeholder="Search by product name or category"
               className="h-12 w-full rounded-full border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
             />
           </div>
@@ -148,13 +148,13 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/login" className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950">
-                Login
+                Sign in
               </Link>
               <Link
                 to="/register"
                 className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
               >
-                Register
+                Create account
               </Link>
             </>
           )}
@@ -170,7 +170,7 @@ const Navbar = () => {
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search products..."
+                placeholder="Search products"
                 className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
               />
             </div>
@@ -202,7 +202,7 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-2xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm font-medium text-primary-700"
               >
-                Open admin dashboard
+                Open admin panel
               </Link>
             )}
 
@@ -220,7 +220,7 @@ const Navbar = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700"
                 >
-                  {user?.name ?? "Profile"}
+                  {user?.name ?? "Account"}
                 </Link>
                 <button
                   type="button"
@@ -233,10 +233,10 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/login" onClick={() => setIsMenuOpen(false)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-                  Login
+                  Sign in
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white">
-                  Register
+                  Create account
                 </Link>
               </>
             )}

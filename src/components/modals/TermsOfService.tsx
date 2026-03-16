@@ -39,7 +39,7 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
                   as="h3"
                   className="text-lg font-medium leading-6 text-dark-700 flex justify-between items-center"
                 >
-                  <span>Общи условия</span>
+                  <span>Terms of service</span>
                   <button
                     type="button"
                     className="rounded-md text-dark-500 hover:text-dark-700"
@@ -50,44 +50,44 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
                 </Dialog.Title>
                 <div className="mt-4 space-y-4 text-dark-700 max-h-[60vh] overflow-y-auto">
                   <section className="space-y-2">
-                    <h4 className="font-semibold">1. Общи разпоредби</h4>
+                    <h4 className="font-semibold">1. General</h4>
                     <p className="text-sm">
-                      Настоящите общи условия уреждат отношенията между Sport Zone ("Дружеството") и потребителите на онлайн платформата.
+                      These terms govern the relationship between SportGoods and customers using the online store.
                     </p>
                   </section>
 
                   <section className="space-y-2">
-                    <h4 className="font-semibold">2. Регистрация и акаунт</h4>
+                    <h4 className="font-semibold">2. Account registration</h4>
                     <p className="text-sm">
-                      За да използвате услугите ни, трябва да създадете акаунт с валиден имейл адрес и да приемете тези общи условия.
+                      You need a valid email address to create an account, place orders, and manage personal details.
                     </p>
                   </section>
 
                   <section className="space-y-2">
-                    <h4 className="font-semibold">3. Поръчки и плащания</h4>
+                    <h4 className="font-semibold">3. Orders and payment</h4>
                     <p className="text-sm">
-                      Всички цени са в български лева и включват ДДС. Плащането се извършва чрез одобрените методи за плащане.
+                      All prices are shown in Bulgarian lev and include VAT. Payment can be made using the methods shown at checkout.
                     </p>
                   </section>
 
                   <section className="space-y-2">
-                    <h4 className="font-semibold">4. Доставка</h4>
+                    <h4 className="font-semibold">4. Delivery</h4>
                     <p className="text-sm">
-                      Доставката се извършва чрез нашите партньорски куриерски фирми. Срокът за доставка е между 2-5 работни дни.
+                      Orders are shipped with courier partners. Typical delivery time for in-stock items is 2 to 5 business days.
                     </p>
                   </section>
 
                   <section className="space-y-2">
-                    <h4 className="font-semibold">5. Връщане и рекламации</h4>
+                    <h4 className="font-semibold">5. Returns and claims</h4>
                     <p className="text-sm">
-                      Имате право да върнете продукт в срок от 14 дни от получаването му, без да посочвате причина.
+                      Unused products can be returned within 14 days of delivery in their original condition.
                     </p>
                   </section>
 
                   <section className="space-y-2">
-                    <h4 className="font-semibold">6. Защита на личните данни</h4>
+                    <h4 className="font-semibold">6. Personal data</h4>
                     <p className="text-sm">
-                      Вашите лични данни се обработват съгласно нашата Политика за поверителност и приложимото законодателство.
+                      Personal data is processed for account management, checkout, and order updates in line with applicable privacy requirements.
                     </p>
                   </section>
                 </div>
@@ -98,7 +98,7 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
                     className="inline-flex justify-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                     onClick={onClose}
                   >
-                    Разбрах
+                    Close
                   </button>
                 </div>
               </Dialog.Panel>

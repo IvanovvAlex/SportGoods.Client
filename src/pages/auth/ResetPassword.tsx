@@ -16,12 +16,12 @@ const ResetPassword = () => {
     setError(null);
 
     if (!token) {
-      setError("Missing password reset token.");
+      setError("This reset link is missing a token.");
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      setError("Use at least 8 characters.");
       return;
     }
 
@@ -48,12 +48,12 @@ const ResetPassword = () => {
         throw new Error("Unable to reset password.");
       }
 
-      setMessage("Password updated successfully. You can now log in with the new credentials.");
+      setMessage("Your password has been updated. You can sign in with the new one now.");
       setPassword("");
       setConfirmPassword("");
     } catch (requestError) {
       console.error(requestError);
-      setError("The reset link is invalid or expired.");
+      setError("This reset link is invalid or has expired.");
     } finally {
       setIsSubmitting(false);
     }
@@ -62,10 +62,10 @@ const ResetPassword = () => {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
       <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_30px_90px_-55px_rgba(15,23,42,0.55)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Set a new password</p>
-        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Create your new password</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">New password</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Choose a new password</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          This screen completes the password recovery flow from the project requirements.
+          Pick a new password for your SportGoods account and keep it somewhere secure.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -106,12 +106,12 @@ const ResetPassword = () => {
             disabled={isSubmitting}
             className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Updating..." : "Update password"}
+            {isSubmitting ? "Updating password..." : "Update password"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-slate-500">
-          Back to <Link to="/login" className="font-semibold text-primary-600">login</Link>
+          Back to <Link to="/login" className="font-semibold text-primary-600">sign in</Link>
         </p>
       </div>
     </div>

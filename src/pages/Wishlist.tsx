@@ -40,7 +40,7 @@ const Wishlist = () => {
               }
             );
             if (!response.ok) {
-              throw new Error("Неуспешно зареждане на продукт");
+              throw new Error("We could not load one of the saved products.");
             }
             return response.json();
           })
@@ -50,7 +50,7 @@ const Wishlist = () => {
         setError(
           err instanceof Error
             ? err.message
-            : "Възникна грешка при зареждането на продуктите"
+            : "We could not load your saved products."
         );
       } finally {
         setLoading(false);
@@ -85,7 +85,7 @@ const Wishlist = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <div className="text-lg">Зареждане...</div>
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
@@ -104,16 +104,16 @@ const Wishlist = () => {
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
           <HeartIcon className="h-16 w-16 text-primary-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Вашият списък с Любими продукти е празен
+            Your wishlist is empty
           </h2>
           <p className="text-gray-600 mb-6">
-            Добавете продукти, които харесвате, в списъка с Любими продукти
+            Save products here so you can come back to them later.
           </p>
           <Link
             to="/products"
             className="inline-flex items-center justify-center bg-primary-500 text-white px-6 py-3 rounded-md hover:text-gray-900 hover:bg-primary-600 transition-colors"
           >
-            Разгледайте продуктите
+            Browse products
           </Link>
         </div>
       </div>
@@ -124,9 +124,9 @@ const Wishlist = () => {
     <div className="min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Списък с желания</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Wishlist</h1>
           <span className="text-gray-600">
-            {wishlistProducts.length} продукта
+            {wishlistProducts.length} {wishlistProducts.length === 1 ? "product" : "products"}
           </span>
         </div>
 
@@ -147,7 +147,7 @@ const Wishlist = () => {
                 <button
                   onClick={() => handleRemoveFromWishlist(product.id)}
                   className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                  title="Премахни от списъка с желания"
+                  title="Remove from wishlist"
                 >
                   <HeartIcon className="h-5 w-5 text-red-500" />
                 </button>
@@ -166,7 +166,7 @@ const Wishlist = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="space-y-1">
                     <p className="text-lg font-bold text-gray-900">
-                      {product.regularPrice.toFixed(2)} лв.
+                      {product.regularPrice.toFixed(2)} BGN
                     </p>
                     {product.discount && (
                       <p className="text-sm text-gray-500 line-through">
@@ -174,7 +174,7 @@ const Wishlist = () => {
                           product.regularPrice *
                           (1 + product.discount / 100)
                         ).toFixed(2)}{" "}
-                        лв.
+                        BGN
                       </p>
                     )}
                   </div>
@@ -186,13 +186,13 @@ const Wishlist = () => {
                     className="flex-1 flex items-center justify-center bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600 transition-colors"
                   >
                     <ShoppingCartIcon className="h-5 w-5 mr-2" />
-                    Добави
+                    Add to cart
                   </button>
                   <Link
                     to={`/products/${product.id}`}
                     className="flex-1 text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
                   >
-                    Детайли
+                    View details
                   </Link>
                 </div>
               </div>

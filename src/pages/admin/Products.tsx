@@ -3,7 +3,6 @@ import {
   PencilIcon,
   TrashIcon,
   PlusIcon,
-  EyeIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
@@ -90,7 +89,6 @@ const AdminProducts = () => {
     mainImageUrl: "",
     secondaryImages: [{ uri: "" }],
   });
-  const [error, setError] = useState("");
   const { token } = useSelector((state: RootState) => state.auth);
   const [categories, setCategories] = useState<Category[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -114,14 +112,14 @@ const AdminProducts = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Неуспешно зареждане на категории");
+        throw new Error("We could not load categories.");
       }
 
       const data = await response.json();
       setCategories(data);
     } catch (err) {
-      console.error("Грешка при зареждане на категории:", err);
-      setError("Неуспешно зареждане на категории");
+      console.error("Error loading categories:", err);
+      toast.error("We could not load categories.");
     }
   };
 
@@ -145,11 +143,10 @@ const AdminProducts = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Неуспешно зареждане на продукти");
+        throw new Error("We could not load products.");
       }
 
       const data = await response.json();
-      console.log("Products API response:", data);
 
       if (data.items && Array.isArray(data.items)) {
         setProducts(data.items);
@@ -160,17 +157,13 @@ const AdminProducts = () => {
         setProducts([]);
       }
     } catch (err) {
-      console.error("Грешка при зареждане на продукти:", err);
-      toast.error("Неуспешно зареждане на продукти");
+      console.error("Error loading products:", err);
+      toast.error("We could not load products.");
       setProducts([]);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log("Current products state:", products);
-  }, [products]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -219,55 +212,55 @@ const AdminProducts = () => {
 
     // Name validation
     if (!formData.name.trim()) {
-      errors.name = "Името е задължително";
+      errors.name = "Product name is required.";
     } else if (formData.name.length < 3) {
-      errors.name = "Името трябва да е поне 3 символа";
+      errors.name = "Use at least 3 characters.";
     }
 
     // Description validation
     if (!formData.description.trim()) {
-      errors.description = "Описанието е задължително";
+      errors.description = "Description is required.";
     } else if (formData.description.length < 3) {
-      errors.description = "Описанието трябва да е поне 3 символа";
+      errors.description = "Use at least 3 characters.";
     }
 
     // Category validation
     if (!formData.categoryId) {
-      errors.categoryId = "Моля, изберете категория";
+      errors.categoryId = "Choose a category.";
     }
 
     // Price validation
     const regularPriceNum = parseFloat(formData.regularPrice);
     if (!formData.regularPrice) {
-      errors.regularPrice = "Цената е задължителна";
+      errors.regularPrice = "Regular price is required.";
     } else if (isNaN(regularPriceNum)) {
-      errors.regularPrice = "Моля, въведете валидна цена";
+      errors.regularPrice = "Enter a valid price.";
     } else if (regularPriceNum < 0) {
-      errors.regularPrice = "Цената не може да бъде отрицателна";
+      errors.regularPrice = "Price cannot be negative.";
     } else if (regularPriceNum > 100000) {
-      errors.regularPrice = "Цената не може да надвишава 100,000";
+      errors.regularPrice = "Price cannot exceed 100,000.";
     }
 
     // Stock validation
     const stockNum = parseInt(formData.stock);
     if (!formData.stock) {
-      errors.stock = "Количеството е задължително";
+      errors.stock = "Stock quantity is required.";
     } else if (isNaN(stockNum)) {
-      errors.stock = "Моля, въведете валидно количество";
+      errors.stock = "Enter a valid quantity.";
     } else if (stockNum < 0) {
-      errors.stock = "Количеството не може да бъде отрицателно";
+      errors.stock = "Quantity cannot be negative.";
     } else if (stockNum > 10000) {
-      errors.stock = "Количеството не може да надвишава 10,000";
+      errors.stock = "Quantity cannot exceed 10,000.";
     }
 
     // Main image validation
     if (!formData.mainImageUrl.trim()) {
-      errors.mainImageUrl = "Основното изображение е задължително";
+      errors.mainImageUrl = "Main image URL is required.";
     } else {
       try {
         new URL(formData.mainImageUrl);
       } catch {
-        errors.mainImageUrl = "Моля, въведете валиден URL адрес";
+        errors.mainImageUrl = "Enter a valid URL.";
       }
     }
 
@@ -279,7 +272,7 @@ const AdminProducts = () => {
           if (!errors.secondaryImages) {
             errors.secondaryImages = [];
           }
-          errors.secondaryImages[index] = "Моля, въведете валиден URL адрес";
+          errors.secondaryImages[index] = "Enter a valid URL.";
         }
       }
     });
@@ -290,7 +283,6 @@ const AdminProducts = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!validateForm()) {
       return;
@@ -330,8 +322,6 @@ const AdminProducts = () => {
         : `${import.meta.env.VITE_API_URL}/Products`;
       const method = isEditing ? "PUT" : "POST";
 
-      console.log("Submitting data:", submitData);
-
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -343,7 +333,7 @@ const AdminProducts = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Неуспешно запазване на продукт");
+        throw new Error(errorData?.message || "We could not save the product.");
       }
 
       await fetchProducts();
@@ -362,10 +352,8 @@ const AdminProducts = () => {
       setValidationErrors({});
       setEditingProduct(null);
     } catch (err) {
-      console.error("Грешка при запазване на продукт:", err);
-      setError(
-        err instanceof Error ? err.message : "Неуспешно запазване на продукт"
-      );
+      console.error("Error saving product:", err);
+      toast.error(err instanceof Error ? err.message : "We could not save the product.");
     }
   };
 
@@ -382,7 +370,6 @@ const AdminProducts = () => {
       mainImageUrl: "",
       secondaryImages: [{ uri: "" }],
     });
-    setError("");
     setIsModalOpen(true);
   };
 
@@ -399,7 +386,6 @@ const AdminProducts = () => {
       mainImageUrl: product.mainImageUrl || "",
       secondaryImages: product.secondaryImages || [],
     });
-    setError("");
     setIsModalOpen(true);
   };
 
@@ -424,17 +410,15 @@ const AdminProducts = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Неуспешно изтриване на продукт");
+        throw new Error(errorData?.message || "We could not delete the product.");
       }
 
       await fetchProducts();
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
     } catch (err) {
-      console.error("Грешка при изтриване на продукт:", err);
-      setError(
-        err instanceof Error ? err.message : "Неуспешно изтриване на продукт"
-      );
+      console.error("Error deleting product:", err);
+      toast.error(err instanceof Error ? err.message : "We could not delete the product.");
     }
   };
 
@@ -453,11 +437,11 @@ const AdminProducts = () => {
     <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Продукти</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Manage products</h1>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <label htmlFor="sortBy" className="text-sm text-gray-700">
-                Сортирай по:
+                Sort by:
               </label>
               <select
                 id="sortBy"
@@ -465,15 +449,15 @@ const AdminProducts = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="title">Име</option>
-                <option value="regularPrice">Цена</option>
-                <option value="quantity">Наличност</option>
-                <option value="rating">Рейтинг</option>
+                <option value="title">Name</option>
+                <option value="regularPrice">Price</option>
+                <option value="quantity">Stock</option>
+                <option value="rating">Rating</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="sortOrder" className="text-sm text-gray-700">
-                Посока:
+                Order:
               </label>
               <select
                 id="sortOrder"
@@ -481,13 +465,13 @@ const AdminProducts = () => {
                 onChange={(e) => setSortDescending(e.target.value === "desc")}
                 className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="desc">Низходящо</option>
-                <option value="asc">Възходящо</option>
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
-                Брой на страница:
+                Per page:
               </label>
               <select
                 id="itemsPerPage"
@@ -509,7 +493,7 @@ const AdminProducts = () => {
               className="flex items-center bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
-              Добави продукт
+              Add product
             </button>
           </div>
         </div>
@@ -520,7 +504,7 @@ const AdminProducts = () => {
           </div>
         ) : !loading && products.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Няма налични продукти</p>
+            <p className="text-gray-500">No products to show.</p>
           </div>
         ) : (
           <>
@@ -529,22 +513,22 @@ const AdminProducts = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Име
+                      Name
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Категория
+                      Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Цена
+                      Price
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Отстъпка
+                      Discount
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Наличност
+                      Stock
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Действия
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -556,7 +540,7 @@ const AdminProducts = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {categories.find((c) => c.id === product.categoryId)
-                          ?.name || "Неизвестна категория"}
+                          ?.name || "Uncategorized"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Intl.NumberFormat("bg-BG", {
@@ -580,14 +564,14 @@ const AdminProducts = () => {
                         <button
                           onClick={() => handleEditProduct(product)}
                           className="text-white bg-yellow-600 hover:bg-yellow-700 p-1.5 rounded-md mr-2"
-                          title="Редактиране"
+                          title="Edit"
                         >
                           <PencilIcon className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(product)}
                           className="text-white bg-red-600 hover:bg-red-700 p-1.5 rounded-md"
-                          title="Изтрий"
+                          title="Delete"
                         >
                           <TrashIcon className="w-5 h-5" />
                         </button>
@@ -605,14 +589,14 @@ const AdminProducts = () => {
                 disabled={currentPage === 1}
                 className={`p-2 rounded-md text-white ${
                   currentPage === 1
-                    ? "bg-gray-200 cursor-not-allowed hover:bg-gray-200" // само това, никакъв hover
-                    : "bg-primary-500 hover:bg-primary-600" // активен стил + hover
+                    ? "bg-gray-200 cursor-not-allowed hover:bg-gray-200"
+                    : "bg-primary-500 hover:bg-primary-600"
                 }`}
               >
                 <ChevronLeftIcon className="h-5 w-5" />
               </button>
               <span className="text-gray-700">
-                Страница {currentPage} от {totalPages}
+                Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -636,14 +620,14 @@ const AdminProducts = () => {
           <div className="bg-white rounded-lg p-3 sm:p-6 w-[80%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
               {editingProduct
-                ? "Редактиране на продукт"
-                : "Добавяне на продукт"}
+                ? "Edit product"
+                : "Add product"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Име
+                    Name
                   </label>
                   <input
                     type="text"
@@ -664,7 +648,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Категория
+                    Category
                   </label>
                   <select
                     name="categoryId"
@@ -676,7 +660,7 @@ const AdminProducts = () => {
                         : "border-gray-300"
                     }`}
                   >
-                    <option value="">Изберете категория</option>
+                    <option value="">Choose category</option>
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
@@ -691,7 +675,7 @@ const AdminProducts = () => {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Описание
+                    Description
                   </label>
                   <ReactQuill
                     theme="snow"
@@ -709,7 +693,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Цена
+                    Regular price
                   </label>
                   <input
                     type="string"
@@ -731,7 +715,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Цена с отстъпка
+                    Sale price
                   </label>
                   <input
                     type="string"
@@ -753,7 +737,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Наличност
+                    Stock
                   </label>
                   <input
                     type="string"
@@ -774,7 +758,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Отстъпка (%)
+                    Discount (%)
                   </label>
                   <input
                     type="number"
@@ -797,7 +781,7 @@ const AdminProducts = () => {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    URL на основно изображение
+                    Main image URL
                   </label>
                   <input
                     type="url"
@@ -819,14 +803,14 @@ const AdminProducts = () => {
                 <div className="col-span-2">
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      URL на допълнителни изображения
+                      Secondary image URLs
                     </label>
                     <button
                       type="button"
                       onClick={addSecondaryImageField}
                       className="text-sm text-white bg-primary-600 hover:text-gray-900 hover:bg-primary-700"
                     >
-                      + Добави изображение
+                      + Add image
                     </button>
                   </div>
                   {formData.secondaryImages.map((url, index) => (
@@ -837,7 +821,7 @@ const AdminProducts = () => {
                         onChange={(e) =>
                           handleSecondaryImageChange(index, e.target.value)
                         }
-                        placeholder="URL на допълнително изображение"
+                        placeholder="Secondary image URL"
                         className={`flex-1 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 ${
                           validationErrors.secondaryImages?.[index]
                             ? "border-red-300"
@@ -857,7 +841,7 @@ const AdminProducts = () => {
                   ))}
                   {validationErrors.secondaryImages?.some((error) => error) && (
                     <p className="mt-1 text-sm text-red-600">
-                      Моля, въведете валидни URL адреси
+                      Enter valid image URLs.
                     </p>
                   )}
                 </div>
@@ -884,13 +868,13 @@ const AdminProducts = () => {
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Отказ
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-primary-500 text-white rounded-md hover:text-gray-900 hover:bg-primary-600"
                 >
-                  {editingProduct ? "Запази" : "Добави"}
+                  {editingProduct ? "Save" : "Add"}
                 </button>
               </div>
             </form>
@@ -903,10 +887,10 @@ const AdminProducts = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-white rounded-lg p-3 sm:p-6 w-[95%] sm:w-[80%] md:w-[60%] lg:w-[40%]">
             <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-              Потвърждение за изтриване
+              Delete product
             </h2>
             <p className="mb-6 text-gray-600">
-              Сигурни ли сте, че искате да изтриете продукта "
+              Delete the product "
               {productToDelete.title}"?
             </p>
             <div className="flex justify-end space-x-3">
@@ -914,13 +898,13 @@ const AdminProducts = () => {
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
-                Отказ
+                Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
-                Изтрий
+                Delete
               </button>
             </div>
           </div>

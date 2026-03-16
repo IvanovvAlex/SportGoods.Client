@@ -43,7 +43,7 @@ const AdminOrders = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("bg-BG", {
+    return date.toLocaleDateString("en-GB", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -79,7 +79,6 @@ const AdminOrders = () => {
       }
 
       const data = await response.json();
-      console.log("Orders API response:", data);
 
       let ordersArray = [];
       if (Array.isArray(data)) {
@@ -94,7 +93,7 @@ const AdminOrders = () => {
       setOrders(ordersArray);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      toast.error("Грешка при зареждането на поръчките");
+      toast.error("We could not load the order list.");
       setOrders([]);
     } finally {
       setLoading(false);
@@ -119,11 +118,11 @@ const AdminOrders = () => {
         throw new Error("Failed to update order status");
       }
 
-      toast.success("Статусът на поръчката беше променен успешно");
+      toast.success("Order status updated.");
       fetchOrders();
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Грешка при промяна на статуса на поръчката");
+      toast.error("We could not update the order status.");
     }
   };
 
@@ -150,11 +149,11 @@ const AdminOrders = () => {
     <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Поръчки</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <label htmlFor="sortBy" className="text-sm text-gray-700">
-                Сортирай по:
+                Sort by:
               </label>
               <select
                 id="sortBy"
@@ -162,14 +161,14 @@ const AdminOrders = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="createdOn">Дата</option>
-                <option value="orderTotalPrice">Сума</option>
-                <option value="status">Статус</option>
+                <option value="createdOn">Date</option>
+                <option value="orderTotalPrice">Total</option>
+                <option value="status">Status</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="sortOrder" className="text-sm text-gray-700">
-                Посока:
+                Order:
               </label>
               <select
                 id="sortOrder"
@@ -177,13 +176,13 @@ const AdminOrders = () => {
                 onChange={(e) => setSortDescending(e.target.value === 'desc')}
                 className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="desc">Низходящо</option>
-                <option value="asc">Възходящо</option>
+                <option value="desc">Newest first</option>
+                <option value="asc">Oldest first</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
-                Брой на страница:
+                Per page:
               </label>
               <select
                 id="itemsPerPage"
@@ -203,7 +202,7 @@ const AdminOrders = () => {
 
         {!loading && orders && orders.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Няма налични поръчки</p>
+            <p className="text-gray-500">No orders to show.</p>
           </div>
         ) : (
           <>
@@ -218,10 +217,10 @@ const AdminOrders = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h2 className="text-lg font-semibold text-gray-900">
-                            Поръчка #{order?.id ? order.id.slice(0, 8) : "N/A"}
+                            Order #{order?.id ? order.id.slice(0, 8) : "N/A"}
                           </h2>
                           <p className="text-sm text-gray-500">
-                            Дата:{" "}
+                            Date:{" "}
                             {order?.createdOn
                               ? formatDate(order.createdOn)
                               : "N/A"}
@@ -256,7 +255,7 @@ const AdminOrders = () => {
                       <div className="mt-6 pt-6 border-t border-gray-200">
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-semibold text-gray-900">
-                            Обща сума:
+                            Order total:
                           </span>
                           <span className="text-lg font-semibold text-gray-900">
                             {new Intl.NumberFormat("bg-BG", {
@@ -286,7 +285,7 @@ const AdminOrders = () => {
                   <ChevronLeftIcon className="h-5 w-5" />
                 </button>
                 <span className="text-gray-700">
-                  Страница {currentPage} от {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}

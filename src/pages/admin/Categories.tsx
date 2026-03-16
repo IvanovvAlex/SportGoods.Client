@@ -47,14 +47,14 @@ const AdminCategories = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Неуспешно зареждане на категории');
+        throw new Error("We could not load categories.");
       }
       
       const data = await response.json();
       setCategories(data);
     } catch (err) {
-      console.error('Грешка при зареждане на категории:', err);
-      setError('Неуспешно зареждане на категории');
+      console.error("Error loading categories:", err);
+      setError("We could not load categories.");
     }
   };
 
@@ -63,26 +63,26 @@ const AdminCategories = () => {
     
     // Name validation
     if (!formData.name.trim()) {
-      errors.name = 'Името е задължително';
+      errors.name = "Category name is required.";
     } else if (formData.name.length < 2) {
-      errors.name = 'Името трябва да е поне 2 символа';
+      errors.name = "Use at least 2 characters.";
     } else if (formData.name.length > 50) {
-      errors.name = 'Името не може да е по-дълго от 50 символа';
+      errors.name = "Use 50 characters or fewer.";
     } else if (categories.some(cat => 
       cat.name.toLowerCase() === formData.name.toLowerCase() && 
       cat.id !== editingCategory?.id
     )) {
-      errors.name = 'Категория с това име вече съществува';
+      errors.name = "A category with this name already exists.";
     }
 
     // Image URL validation
     if (!formData.imageURI.trim()) {
-      errors.imageURI = 'URL на изображението е задължително';
+      errors.imageURI = "Category image URL is required.";
     } else {
       try {
         new URL(formData.imageURI);
       } catch {
-        errors.imageURI = 'Моля, въведете валиден URL адрес';
+        errors.imageURI = "Enter a valid URL.";
       }
     }
 
@@ -132,7 +132,7 @@ const AdminCategories = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Неуспешно запазване на категория');
+        throw new Error(errorData?.message || "We could not save the category.");
       }
 
       await fetchCategories();
@@ -140,8 +140,8 @@ const AdminCategories = () => {
       setFormData({ name: '', imageURI: '' });
       setEditingCategory(null);
     } catch (err) {
-      console.error('Грешка при запазване на категория:', err);
-      setError(err instanceof Error ? err.message : 'Неуспешно запазване на категория');
+      console.error("Error saving category:", err);
+      setError(err instanceof Error ? err.message : "We could not save the category.");
     }
   };
 
@@ -181,28 +181,28 @@ const AdminCategories = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Неуспешно изтриване на категория');
+        throw new Error("We could not delete the category.");
       }
 
       await fetchCategories();
       setIsDeleteModalOpen(false);
       setCategoryToDelete(null);
     } catch (err) {
-      console.error('Грешка при изтриване на категория:', err);
-      setError('Неуспешно изтриване на категория');
+      console.error("Error deleting category:", err);
+      setError("We could not delete the category.");
     }
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Управление на категории</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Manage categories</h1>
         <button
           onClick={handleAddCategory}
           className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-md hover:text-gray-900 hover:bg-primary-600 transition-colors"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
-          Добави категория
+          Add category
         </button>
       </div>
 
@@ -217,10 +217,10 @@ const AdminCategories = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Име
+                Name
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Действия
+                Actions
               </th>
             </tr>
           </thead>
@@ -234,14 +234,14 @@ const AdminCategories = () => {
                   <button
                     onClick={() => handleEditCategory(category)}
                     className="text-white bg-yellow-600 hover:bg-yellow-700 p-1.5 rounded-md mr-2"
-                    title="Редактиране"
+                    title="Edit"
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(category)}
                     className="text-white bg-red-600 hover:bg-red-700 p-1.5 rounded-md"
-                    title="Изтрий"
+                    title="Delete"
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
@@ -257,7 +257,7 @@ const AdminCategories = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">
-              {editingCategory ? 'Редактиране на категория' : 'Добавяне на категория'}
+              {editingCategory ? "Edit category" : "Add category"}
             </h2>
             {error && (
               <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -267,7 +267,7 @@ const AdminCategories = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Име
+                  Name
                 </label>
                 <input
                   type="text"
@@ -285,7 +285,7 @@ const AdminCategories = () => {
 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  URL на изображение
+                  Image URL
                 </label>
                 <input
                   type="url"
@@ -312,13 +312,13 @@ const AdminCategories = () => {
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Отказ
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-primary-500 text-white rounded-md hover:text-gray-900 hover:bg-primary-600"
                 >
-                  {editingCategory ? 'Запази' : 'Добави'}
+                  {editingCategory ? "Save" : "Add"}
                 </button>
               </div>
             </form>
@@ -330,12 +330,12 @@ const AdminCategories = () => {
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Потвърждение за изтриване</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Delete category</h2>
             <p className="mb-6 text-gray-600">
-              Сигурни ли сте, че искате да изтриете категорията "{categoryToDelete?.name}"?
+              Delete the category "{categoryToDelete?.name}"?
               {categoryToDelete && categoryToDelete.productCount > 0 && (
                 <span className="block mt-2 text-red-600">
-                  Внимание: Тази категория съдържа {categoryToDelete.productCount} продукта(и).
+                  This category still contains {categoryToDelete.productCount} product{categoryToDelete.productCount === 1 ? "" : "s"}.
                 </span>
               )}
             </p>
@@ -344,13 +344,13 @@ const AdminCategories = () => {
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
-                Отказ
+                Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
-                Изтрий
+                Delete
               </button>
             </div>
           </div>

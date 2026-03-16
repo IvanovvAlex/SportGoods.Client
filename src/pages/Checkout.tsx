@@ -23,13 +23,13 @@ interface ProfileResponse {
 }
 
 const paymentOptions = [
-  { value: "online-card", label: "Online card payment", description: "Demo online gateway configured through backend appsettings." },
-  { value: "bank-transfer", label: "Bank transfer", description: "Manual confirmation flow with bank transfer instructions." },
+  { value: "online-card", label: "Card payment", description: "Pay online when you place the order." },
+  { value: "bank-transfer", label: "Bank transfer", description: "Receive bank details after checkout confirmation." },
 ];
 
 const deliveryOptions = [
-  { value: "standard-courier", label: "Standard courier", description: "2-4 business days" },
-  { value: "express-courier", label: "Express courier", description: "Next-business-day delivery" },
+  { value: "standard-courier", label: "Standard courier", description: "2 to 4 business days" },
+  { value: "express-courier", label: "Express courier", description: "Next business day for in-stock items" },
 ];
 
 const Checkout = () => {
@@ -84,7 +84,7 @@ const Checkout = () => {
         }
       } catch (requestError) {
         console.error(requestError);
-        setError("Checkout data could not be loaded. Please review your cart and try again.");
+        setError("We could not load your checkout details. Review your cart and try again.");
       } finally {
         setIsLoading(false);
       }
@@ -113,7 +113,7 @@ const Checkout = () => {
     }
 
     if (!formData.consentAccepted) {
-      setError("You must accept personal data processing for the order.");
+      setError("You need to accept the privacy notice before placing the order.");
       return;
     }
 
@@ -131,7 +131,7 @@ const Checkout = () => {
 
       if (!response.ok) {
         const responseText = await response.text();
-        throw new Error(responseText || "Unable to place the order.");
+        throw new Error(responseText || "We could not place the order.");
       }
 
       navigate("/checkout/confirmation", {
@@ -145,7 +145,7 @@ const Checkout = () => {
       });
     } catch (requestError) {
       console.error(requestError);
-      setError(requestError instanceof Error ? requestError.message : "Unable to place the order.");
+      setError(requestError instanceof Error ? requestError.message : "We could not place the order.");
     } finally {
       setIsSubmitting(false);
     }
@@ -175,10 +175,9 @@ const Checkout = () => {
           <form onSubmit={handleSubmit} className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_28px_90px_-60px_rgba(15,23,42,0.55)] sm:p-8">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Checkout</p>
-              <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Delivery, payment, and order confirmation</h1>
+              <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Shipping and payment</h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                This flow follows the presentation activity and sequence diagrams: availability is checked,
-                payment method is selected, and the order moves into status tracking.
+                Confirm your delivery details, choose a payment method, and place the order for the items currently reserved in your cart.
               </p>
             </div>
 
@@ -302,13 +301,13 @@ const Checkout = () => {
                       <p className="text-sm font-semibold text-slate-900">{item.title}</p>
                       <p className="text-xs text-slate-500">Quantity: {item.quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold text-slate-900">{item.totalPrice.toFixed(2)} лв.</p>
+                    <p className="text-sm font-semibold text-slate-900">{item.totalPrice.toFixed(2)} BGN</p>
                   </div>
                 ))}
               </div>
               <div className="mt-6 rounded-2xl bg-slate-950 px-4 py-4 text-white">
                 <p className="text-sm text-slate-300">Total</p>
-                <p className="mt-2 font-display text-3xl font-bold">{cart?.orderTotalPrice.toFixed(2) ?? "0.00"} лв.</p>
+                <p className="mt-2 font-display text-3xl font-bold">{cart?.orderTotalPrice.toFixed(2) ?? "0.00"} BGN</p>
               </div>
             </div>
 

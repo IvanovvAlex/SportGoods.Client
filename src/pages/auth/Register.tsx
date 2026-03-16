@@ -26,7 +26,7 @@ const Register = () => {
     }
 
     if (!acceptedTerms) {
-      setError("You must accept the terms and privacy conditions.");
+      setError("You need to accept the terms and privacy notice to continue.");
       return;
     }
 
@@ -47,7 +47,7 @@ const Register = () => {
       });
 
       if (response.status === 409) {
-        throw new Error("This email is already registered.");
+        throw new Error("An account with this email already exists.");
       }
 
       if (!response.ok) {
@@ -56,7 +56,7 @@ const Register = () => {
 
       navigate("/login", {
         state: {
-          message: "Registration completed successfully. You can now sign in.",
+          message: "Your account is ready. You can sign in now.",
         },
       });
     } catch (requestError) {
@@ -71,9 +71,9 @@ const Register = () => {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
       <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)]">
         <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Create account</p>
-        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Register for SportGoods</h1>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Create your SportGoods account</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Start browsing, add products to cart, place orders, and manage your data through the new privacy entry points.
+          Save your details for faster checkout, keep a wishlist, and follow your orders from one place.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -163,7 +163,7 @@ const Register = () => {
               className="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
             />
             <span>
-              I agree with the terms of service and consent to the handling of my personal data for account and order processing.
+              I agree to the terms of service and the use of my personal data for account setup, checkout, and order updates.
               <button type="button" onClick={() => setIsTermsOpen(true)} className="ml-1 font-semibold text-primary-600">
                 Read terms
               </button>
@@ -175,12 +175,12 @@ const Register = () => {
             disabled={isSubmitting}
             className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Creating account..." : "Register"}
+            {isSubmitting ? "Creating account..." : "Create account"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-slate-500">
-          Already registered? <Link to="/login" className="font-semibold text-primary-600">Login</Link>
+          Already have an account? <Link to="/login" className="font-semibold text-primary-600">Sign in</Link>
         </p>
       </div>
 

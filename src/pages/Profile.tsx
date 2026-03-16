@@ -74,7 +74,7 @@ const Profile = () => {
       }
 
       setIsEditing(false);
-      setMessage("Profile updated successfully.");
+      setMessage("Account details updated.");
     } catch (requestError) {
       console.error(requestError);
       setError("Unable to update profile.");
@@ -104,7 +104,7 @@ const Profile = () => {
       link.download = "sportgoods-personal-data.json";
       link.click();
       URL.revokeObjectURL(downloadUrl);
-      setMessage("Personal data export downloaded.");
+      setMessage("Your data export has been downloaded.");
     } catch (requestError) {
       console.error(requestError);
       setError("Unable to export personal data.");
@@ -112,7 +112,7 @@ const Profile = () => {
   };
 
   const deleteAccount = async () => {
-    const confirmed = window.confirm("Delete and anonymize your account data?");
+    const confirmed = window.confirm("Delete and anonymize this account?");
     if (!confirmed) {
       return;
     }
@@ -156,7 +156,7 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Account profile</p>
-                <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-950">Profile and privacy controls</h1>
+                <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-950">Account settings</h1>
               </div>
             </div>
             <Link
@@ -233,9 +233,9 @@ const Profile = () => {
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.55)]">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">GDPR tools</p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-slate-950">Export personal data</h2>
+            <h2 className="mt-3 font-display text-2xl font-bold text-slate-950">Download your data</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              Download the current profile, orders, wishlist references, and reviews the backend exposes for your account.
+              Export the profile details, orders, wishlist entries, and reviews currently associated with your account.
             </p>
             <button
               type="button"
@@ -243,15 +243,15 @@ const Profile = () => {
               className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
             >
               <ArrowDownTrayIcon className="h-4 w-4" />
-              Export my data
+              Download export
             </button>
           </article>
 
           <article className="rounded-[2rem] border border-rose-200 bg-white p-6 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.55)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-rose-600">Account deletion</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-rose-600">Close account</p>
             <h2 className="mt-3 font-display text-2xl font-bold text-slate-950">Delete and anonymize account data</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              This action anonymizes profile fields, clears personal delivery details from orders, and removes access to the account.
+              This removes access to the account, anonymizes profile fields, and clears personal delivery details from past orders.
             </p>
             <button
               type="button"

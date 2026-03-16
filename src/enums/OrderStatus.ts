@@ -11,21 +11,21 @@ export enum OrderStatus {
 export const getOrderStatusText = (status: OrderStatus): string => {
   switch (status) {
     case OrderStatus.Created:
-      return "Незавършена";
+      return "Draft";
     case OrderStatus.PendingVerification:
-      return "Изчаква потвърждение";
+      return "Pending review";
     case OrderStatus.Verified:
-      return "Потвърдена";
+      return "Verified";
     case OrderStatus.Processing:
-      return "Обработва се";
+      return "Processing";
     case OrderStatus.Shipped:
-      return "Изпратена";
+      return "Shipped";
     case OrderStatus.Delivered:
-      return "Доставена";
+      return "Delivered";
     case OrderStatus.Cancelled:
-      return "Отменена";
+      return "Cancelled";
     default:
-      return "Неизвестен";
+      return "Unknown";
   }
 };
 

@@ -24,11 +24,10 @@ const CheckoutConfirmation = () => {
           <CheckCircleIcon className="h-9 w-9" />
         </div>
         <h1 className="mt-6 text-center font-display text-4xl font-bold tracking-tight text-slate-950">
-          Order confirmation
+          Order received
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-7 text-slate-600">
-          Your order was placed successfully. Stock was reserved, the admin team can track the order status,
-          and the notification service will prepare the confirmation/update emails.
+          Your order has been placed successfully. We&apos;ll confirm stock, prepare shipment, and keep you updated as the status changes.
         </p>
 
         <div className="mt-10 grid gap-4 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:grid-cols-2">
@@ -55,11 +54,11 @@ const CheckoutConfirmation = () => {
             to="/orders"
             className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-600"
           >
-            Track orders
+            View orders
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
-            to="/store"
+            to="/products"
             className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
           >
             Continue shopping

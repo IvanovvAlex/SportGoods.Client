@@ -8,7 +8,7 @@ const navigation = [
   { to: "/admin/orders", label: "Orders", icon: QueueListIcon },
   { to: "/admin/products", label: "Products", icon: CubeIcon },
   { to: "/admin/categories", label: "Categories", icon: ChartBarSquareIcon },
-  { to: "/admin/users", label: "Users", icon: UsersIcon },
+  { to: "/admin/users", label: "Customers", icon: UsersIcon },
 ];
 
 const AdminPanel = () => {
@@ -24,9 +24,9 @@ const AdminPanel = () => {
         <aside className="border-r border-slate-200 bg-slate-950 px-6 py-8 text-slate-100">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary-300">Admin workspace</p>
-            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight">SportGoods dashboard</h1>
+            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight">SportGoods admin</h1>
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Track orders, inventory, low-stock warnings, and management actions from a single analytics-style shell.
+              Manage products, categories, customers, and order activity from one back-office workspace.
             </p>
           </div>
 

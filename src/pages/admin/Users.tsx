@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { EyeIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 
@@ -25,7 +25,6 @@ const AdminUsers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [error, setError] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ 
     names: '', 
     email: '', 
@@ -48,14 +47,14 @@ const AdminUsers = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Неуспешно зареждане на потребители');
+        throw new Error("We could not load customers.");
       }
       
       const data = await response.json();
       setUsers(data);
     } catch (err) {
-      console.error('Грешка при зареждане на потребители:', err);
-      setError('Неуспешно зареждане на потребители');
+      console.error("Error loading customers:", err);
+      setError("We could not load customers.");
     }
   };
 
@@ -68,11 +67,6 @@ const AdminUsers = () => {
       newPassword: '' 
     });
     setIsModalOpen(true);
-    setIsEditing(false);
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,42 +83,42 @@ const AdminUsers = () => {
     
     // Names validation
     if (!editFormData.names.trim()) {
-      errors.names = 'Името е задължително';
+      errors.names = "Customer name is required.";
     } else if (editFormData.names.length < 2) {
-      errors.names = 'Името трябва да е поне 2 символа';
+      errors.names = "Use at least 2 characters.";
     } else if (editFormData.names.length > 50) {
-      errors.names = 'Името не може да е по-дълго от 50 символа';
+      errors.names = "Use 50 characters or fewer.";
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!editFormData.email.trim()) {
-      errors.email = 'Имейлът е задължителен';
+      errors.email = "Email is required.";
     } else if (!emailRegex.test(editFormData.email)) {
-      errors.email = 'Моля, въведете валиден имейл адрес';
+      errors.email = "Enter a valid email address.";
     } else if (users.some(user => 
       user.email.toLowerCase() === editFormData.email.toLowerCase() && 
       user.id !== selectedUser?.id
     )) {
-      errors.email = 'Потребител с този имейл вече съществува';
+      errors.email = "A customer with this email already exists.";
     }
 
     // Phone validation (optional)
     if (editFormData.phone.trim()) {
       const phoneRegex = /^[0-9]{10}$/;
       if (!phoneRegex.test(editFormData.phone.trim())) {
-        errors.phone = 'Моля, въведете валиден телефонен номер (10 цифри)';
+        errors.phone = "Enter a valid 10-digit phone number.";
       }
     }
 
     // Password validation (required for new users, optional for editing)
     if (!selectedUser && !editFormData.newPassword) {
-      errors.newPassword = 'Паролата е задължителна за нови потребители';
+      errors.newPassword = "Password is required for new customers.";
     } else if (editFormData.newPassword) {
       if (editFormData.newPassword.length < 6) {
-        errors.newPassword = 'Паролата трябва да е поне 6 символа';
+        errors.newPassword = "Use at least 6 characters.";
       } else if (editFormData.newPassword.length > 100) {
-        errors.newPassword = 'Паролата не може да е по-дълга от 100 символа';
+        errors.newPassword = "Use 100 characters or fewer.";
       }
     }
 
@@ -167,7 +161,7 @@ const AdminUsers = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Неуспешно запазване на потребител');
+        throw new Error(errorData?.message || "We could not save the customer.");
       }
 
       await fetchUsers();
@@ -181,8 +175,8 @@ const AdminUsers = () => {
       setValidationErrors({});
       setSelectedUser(null);
     } catch (err) {
-      console.error('Грешка при запазване на потребител:', err);
-      setError(err instanceof Error ? err.message : 'Неуспешно запазване на потребител');
+      console.error("Error saving customer:", err);
+      setError(err instanceof Error ? err.message : "We could not save the customer.");
     }
   };
 
@@ -203,15 +197,15 @@ const AdminUsers = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Неуспешно изтриване на потребител');
+        throw new Error("We could not delete the customer.");
       }
 
       await fetchUsers();
       setIsDeleteModalOpen(false);
       setSelectedUser(null);
     } catch (err) {
-      console.error('Грешка при изтриване на потребител:', err);
-      setError('Неуспешно изтриване на потребител');
+      console.error("Error deleting customer:", err);
+      setError("We could not delete the customer.");
     }
   };
 
@@ -235,7 +229,7 @@ const AdminUsers = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Неуспешна промяна на роля');
+        throw new Error(errorData?.message || "We could not update the customer role.");
       }
 
       await fetchUsers();
@@ -246,15 +240,15 @@ const AdminUsers = () => {
         }
       }
     } catch (err) {
-      console.error('Грешка при промяна на роля:', err);
-      setError(err instanceof Error ? err.message : 'Неуспешна промяна на роля');
+      console.error("Error changing role:", err);
+      setError(err instanceof Error ? err.message : "We could not update the customer role.");
     }
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Управление на потребители</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Manage customers</h1>
         <button
           onClick={() => {
             setSelectedUser(null);
@@ -269,7 +263,7 @@ const AdminUsers = () => {
           className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-md hover:text-gray-900 hover:bg-primary-600 transition-colors"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
-          Добави потребител
+          Add customer
         </button>
       </div>
 
@@ -284,19 +278,19 @@ const AdminUsers = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Име
+                Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Имейл
+                Email
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Телефон
+                Phone
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Роля
+                Role
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Действия
+                Actions
               </th>
             </tr>
           </thead>
@@ -310,7 +304,7 @@ const AdminUsers = () => {
                   {user.email}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {user.phone || 'Няма въведен'}
+                  {user.phone || "Not provided"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
@@ -319,24 +313,23 @@ const AdminUsers = () => {
                       user.role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
                     } hover:bg-opacity-75 transition-colors`}
                   >
-                    {user.role === 'Admin' ? 'Администратор' : 'Потребител'}
+                    {user.role === "Admin" ? "Admin" : "Customer"}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => {
                       handleViewUser(user);
-                      handleEditClick();
                     }}
                     className="text-white bg-yellow-600 hover:bg-yellow-700 p-1.5 rounded-md mr-2"
-                    title="Редактиране"
+                    title="Edit"
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(user)}
                     className="text-white bg-red-600 hover:bg-red-700 p-1.5 rounded-md"
-                    title="Изтрий"
+                    title="Delete"
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
@@ -352,13 +345,13 @@ const AdminUsers = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-white rounded-lg p-3 sm:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-              {selectedUser ? 'Редактиране на потребител' : 'Добавяне на потребител'}
+              {selectedUser ? "Edit customer" : "Add customer"}
             </h2>
             <div className="space-y-3 sm:space-y-4">
               <form onSubmit={handleUpdateUser} className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                    Име
+                    Name
                   </label>
                   <input
                     type="text"
@@ -376,7 +369,7 @@ const AdminUsers = () => {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                    Имейл
+                    Email
                   </label>
                   <input
                     type="email"
@@ -394,7 +387,7 @@ const AdminUsers = () => {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                    Телефон
+                    Phone
                   </label>
                   <input
                     type="tel"
@@ -413,7 +406,7 @@ const AdminUsers = () => {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                    {selectedUser ? 'Нова парола (незадължително)' : 'Парола'}
+                    {selectedUser ? "New password (optional)" : "Password"}
                   </label>
                   <input
                     type="password"
@@ -444,13 +437,13 @@ const AdminUsers = () => {
                     }}
                     className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-xs sm:text-sm"
                   >
-                    Затвори
+                    Close
                   </button>
                   <button
                     type="submit"
                     className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-500 text-white rounded-md hover:text-gray-900 hover:bg-primary-600 text-xs sm:text-sm"
                   >
-                    {selectedUser ? 'Запази' : 'Добави'}
+                    {selectedUser ? "Save" : "Add"}
                   </button>
                 </div>
               </form>
@@ -463,22 +456,22 @@ const AdminUsers = () => {
       {isDeleteModalOpen && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-white rounded-lg p-3 sm:p-6 max-w-md w-full">
-            <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Потвърждение за изтриване</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Delete customer</h2>
             <p className="mb-4 sm:mb-6 text-gray-600 text-xs sm:text-sm">
-              Сигурни ли сте, че искате да изтриете потребителя "{selectedUser.names}"?
+              Delete the customer "{selectedUser.names}"?
             </p>
             <div className="flex justify-end space-x-2 sm:space-x-3">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-xs sm:text-sm"
               >
-                Отказ
+                Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-xs sm:text-sm"
               >
-                Изтрий
+                Delete
               </button>
             </div>
           </div>

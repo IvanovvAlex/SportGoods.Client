@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
@@ -22,7 +22,6 @@ interface CartResponse {
 }
 
 const Cart = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);
   const [cart, setCart] = useState<CartResponse | null>(null);
@@ -60,7 +59,7 @@ const Cart = () => {
       setCart(data);
     } catch (error) {
       console.error("Error fetching cart items:", error);
-      toast.error("Възникна грешка при зареждането на количката");
+      toast.error("We could not load your cart.");
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +160,7 @@ const Cart = () => {
       }
 
       await fetchCartItems(); // Refresh the cart
-      toast.success("Продуктът беше премахнат от количката", {
+      toast.success("Item removed from your cart.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -173,49 +172,7 @@ const Cart = () => {
       });
     } catch (error) {
       console.error("Error removing item:", error);
-      toast.error("Възникна грешка при премахването на продукта", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
-  };
-
-  const handleClearCart = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/Orders/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to clear cart");
-      }
-
-      setCart(null);
-      toast.success("Количката беше изчистена успешно", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    } catch (error) {
-      console.error("Error clearing cart:", error);
-      toast.error("Възникна грешка при изчистването на количката", {
+      toast.error("We could not remove that item.", {
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -245,17 +202,16 @@ const Cart = () => {
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-xl text-center">
           <h2 className="text-2xl font-bold text-gray-900">
-            Количката е празна
+            Your cart is empty
           </h2>
           <p className="text-gray-600">
-            Вашата количка е празна. Разгледайте нашите продукти и добавете нещо
-            интересно!
+            Start browsing the catalog to find the gear you need.
           </p>
           <Link
             to="/products"
             className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
-            Към продуктите
+            Browse products
           </Link>
         </div>
       </div>
@@ -278,7 +234,7 @@ const Cart = () => {
       />
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Количка</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Cart</h1>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
@@ -299,7 +255,7 @@ const Cart = () => {
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-primary-600 font-semibold">
-                      {item.singlePrice.toFixed(2)} лв.
+                      {item.singlePrice.toFixed(2)} BGN
                     </p>
                     <span className="text-gray-400">×</span>
                     <p className="text-primary-600 font-semibold">
@@ -307,7 +263,7 @@ const Cart = () => {
                     </p>
                     <span className="text-gray-400">=</span>
                     <p className="text-primary-600 font-semibold">
-                      {(item.singlePrice * item.quantity).toFixed(2)} лв.
+                      {(item.singlePrice * item.quantity).toFixed(2)} BGN
                     </p>
                   </div>
                 </div>
@@ -341,7 +297,7 @@ const Cart = () => {
                   <button
                     onClick={() => handleRemoveItem(item.productId)}
                     className="text-white transition-colors p-2"
-                    title="Премахни от количката"
+                    title="Remove from cart"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -354,14 +310,14 @@ const Cart = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="space-y-1">
                 <p className="text-xl font-semibold text-gray-900">
-                  Обща сума: {cart.orderTotalPrice.toFixed(2)} лв.
+                  Order total: {cart.orderTotalPrice.toFixed(2)} BGN
                 </p>
               </div>
               <button
                 onClick={handleCheckout}
                 className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
-                Продължи към плащане
+                Continue to checkout
               </button>
             </div>
           </div>

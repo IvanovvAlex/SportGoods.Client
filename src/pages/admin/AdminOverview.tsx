@@ -83,14 +83,44 @@ const AdminOverview = () => {
     void fetchOverviewData();
   }, [token]);
 
-  const totalRevenue = useMemo(
-    () => orders.reduce((sum, order) => sum + order.orderTotalPrice, 0),
-    [orders]
-  );
-
   const lowStockProducts = useMemo(
     () => products.filter((product) => product.quantity <= LOW_STOCK_THRESHOLD),
     [products]
+  );
+
+  const startOfToday = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  }, []);
+
+  const startOfWeek = useMemo(() => {
+    const weekStart = new Date(startOfToday);
+    weekStart.setDate(weekStart.getDate() - 6);
+    return weekStart;
+  }, [startOfToday]);
+
+  const ordersToday = useMemo(
+    () => orders.filter((order) => new Date(order.createdOn) >= startOfToday),
+    [orders, startOfToday],
+  );
+
+  const weeklyRevenue = useMemo(
+    () =>
+      orders
+        .filter(
+          (order) =>
+            new Date(order.createdOn) >= startOfWeek &&
+            order.status !== OrderStatus.Cancelled &&
+            order.status !== OrderStatus.Created,
+        )
+        .reduce((sum, order) => sum + order.orderTotalPrice, 0),
+    [orders, startOfWeek],
+  );
+
+  const activeCustomers = useMemo(
+    () => new Set(orders.map((order) => order.names).filter(Boolean)).size,
+    [orders],
   );
 
   const orderStatusGroups = useMemo(() => {
@@ -120,16 +150,16 @@ const AdminOverview = () => {
   return (
     <div className="space-y-6">
       <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.55)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Dashboard overview</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Sales overview</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-3xl font-bold tracking-tight text-slate-950">Operational snapshot</h2>
             <p className="mt-2 text-sm text-slate-600">
-              Analytics-style visibility over orders, stock levels, catalog size, and customer accounts.
+              Today&apos;s order activity, current stock health, and recent customer demand across the catalog.
             </p>
           </div>
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
-            {lowStockProducts.length} products need replenishment review
+            {lowStockProducts.length} products need replenishment attention
           </div>
         </div>
       </div>
@@ -137,28 +167,28 @@ const AdminOverview = () => {
       <div className="grid gap-4 xl:grid-cols-4">
         {[
           {
-            label: "Products",
-            value: products.length,
-            detail: `${lowStockProducts.length} low stock`,
-            icon: CubeTransparentIcon,
-          },
-          {
-            label: "Orders",
-            value: orders.length,
-            detail: `${orders.filter((order) => order.status === OrderStatus.PendingVerification).length} pending verification`,
+            label: "Orders today",
+            value: ordersToday.length,
+            detail: `${orders.filter((order) => order.status === OrderStatus.PendingVerification).length} pending review`,
             icon: ShoppingBagIcon,
           },
           {
-            label: "Users",
-            value: users.length,
-            detail: `${categories.length} categories`,
-            icon: UserGroupIcon,
+            label: "Revenue this week",
+            value: `${weeklyRevenue.toFixed(2)} BGN`,
+            detail: "Last 7 days, excluding cancelled orders",
+            icon: BellAlertIcon,
           },
           {
-            label: "Revenue",
-            value: `${totalRevenue.toFixed(2)} лв.`,
-            detail: "Processed order totals",
-            icon: BellAlertIcon,
+            label: "Low stock items",
+            value: lowStockProducts.length,
+            detail: `Below ${LOW_STOCK_THRESHOLD} units`,
+            icon: CubeTransparentIcon,
+          },
+          {
+            label: "Active customers",
+            value: activeCustomers,
+            detail: `${users.length} accounts, ${categories.length} categories`,
+            icon: UserGroupIcon,
           },
         ].map((item) => (
           <article key={item.label} className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.55)]">
@@ -176,7 +206,7 @@ const AdminOverview = () => {
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.55)]">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Order statistics</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Order pipeline</p>
               <h3 className="mt-3 font-display text-2xl font-bold text-slate-950">Status distribution</h3>
             </div>
           </div>
@@ -203,8 +233,8 @@ const AdminOverview = () => {
         </section>
 
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.55)]">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Inventory overview</p>
-          <h3 className="mt-3 font-display text-2xl font-bold text-slate-950">Low stock alerts</h3>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Inventory</p>
+          <h3 className="mt-3 font-display text-2xl font-bold text-slate-950">Products to restock</h3>
           <div className="mt-6 space-y-3">
             {lowStockProducts.slice(0, 6).map((product) => (
               <div key={product.id} className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
@@ -219,7 +249,7 @@ const AdminOverview = () => {
                 </div>
               </div>
             ))}
-            {lowStockProducts.length === 0 && <p className="text-sm text-slate-500">No low-stock alerts right now.</p>}
+            {lowStockProducts.length === 0 && <p className="text-sm text-slate-500">All tracked products are above the low-stock threshold.</p>}
           </div>
         </section>
       </div>
@@ -246,15 +276,15 @@ const AdminOverview = () => {
               {recentOrders.map((order) => (
                 <tr key={order.id}>
                   <td className="px-4 py-4 text-slate-900">{order.names ?? "Customer"}</td>
-                  <td className="px-4 py-4 text-slate-600">{order.items.length} items</td>
+                  <td className="px-4 py-4 text-slate-600">{order.items.length} {order.items.length === 1 ? "item" : "items"}</td>
                   <td className="px-4 py-4 text-slate-600">{getOrderStatusText(order.status)}</td>
-                  <td className="px-4 py-4 text-right font-semibold text-slate-900">{order.orderTotalPrice.toFixed(2)} лв.</td>
+                  <td className="px-4 py-4 text-right font-semibold text-slate-900">{order.orderTotalPrice.toFixed(2)} BGN</td>
                 </tr>
               ))}
               {recentOrders.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-10 text-center text-slate-500">
-                    No recent orders available.
+                    No recent orders yet.
                   </td>
                 </tr>
               )}

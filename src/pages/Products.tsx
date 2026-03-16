@@ -37,7 +37,6 @@ const Products = () => {
     pageSize: 10,
     pageNumber: 1,
   });
-  const [isLoading, setIsLoading] = useState(false);
   const fetchTimeoutRef = useRef<number>();
 
   useEffect(() => {
@@ -84,7 +83,6 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setIsLoading(true);
         let url = `${import.meta.env.VITE_API_URL}/Products`;
         const params = new URLSearchParams();
 
@@ -130,8 +128,6 @@ const Products = () => {
         console.error("Error fetching products:", error);
         setProducts([]);
         setTotalCount(0);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -212,7 +208,7 @@ const Products = () => {
                   : "All products"}
             </h1>
             <p className="mt-2 text-sm text-slate-600">
-                Showing {products.length} of {totalCount} products with category and price filters from the project scope.
+                Showing {products.length} of {totalCount} products. Use category, price, and rating filters to narrow the list.
             </p>
           </div>
             <div className="flex flex-wrap items-center gap-3">

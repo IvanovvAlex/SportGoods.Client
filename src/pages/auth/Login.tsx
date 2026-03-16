@@ -52,10 +52,10 @@ const Login = () => {
         setUser({
           id: data.userId ?? "",
           email: data.email ?? email,
-          name: data.names ?? "SportGoods User",
+          name: data.names ?? "Customer",
           phone: data.phone ?? "",
           role: data.role ?? "RegisteredCustomer",
-        })
+        }),
       );
 
       if (data.role === "Admin") {
@@ -66,7 +66,7 @@ const Login = () => {
       navigate("/");
     } catch (requestError) {
       console.error(requestError);
-      setError("Please enter a valid email and password.");
+      setError("Enter a valid email and password.");
     } finally {
       setIsSubmitting(false);
     }
@@ -75,10 +75,10 @@ const Login = () => {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
       <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Customer access</p>
-        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Login to your account</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Sign in</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Sign in to your SportGoods account</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Continue to cart, checkout, order tracking, profile privacy tools, and the admin dashboard if your account has admin rights.
+          Access your cart, track orders, manage saved products, and update your account details.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -133,12 +133,12 @@ const Login = () => {
             disabled={isSubmitting}
             className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Signing in..." : "Login"}
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-slate-500">
-          No account yet? <Link to="/register" className="font-semibold text-primary-600">Create one</Link>
+          New here? <Link to="/register" className="font-semibold text-primary-600">Create an account</Link>
         </p>
       </div>
     </div>

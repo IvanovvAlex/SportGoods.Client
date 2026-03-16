@@ -52,7 +52,7 @@ const Orders = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("bg-BG", {
+    return date.toLocaleDateString("en-GB", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -69,7 +69,7 @@ const Orders = () => {
     try {
       const userId = getUserIdFromToken();
       if (!userId) {
-        toast.error("Грешка при идентификация на потребителя");
+        toast.error("We could not identify your account.");
         return;
       }
 
@@ -95,7 +95,6 @@ const Orders = () => {
       }
 
       const data = await response.json();
-      console.log("Orders API response:", data);
 
       let ordersArray = [];
       if (Array.isArray(data)) {
@@ -110,7 +109,7 @@ const Orders = () => {
       setOrders(ordersArray);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      toast.error("Грешка при зареждането на поръчките");
+      toast.error("We could not load your orders.");
       setOrders([]);
     } finally {
       setLoading(false);
@@ -138,11 +137,11 @@ const Orders = () => {
         throw new Error("Failed to cancel order");
       }
 
-      toast.success("Поръчката беше отменена успешно");
+      toast.success("Order cancelled.");
       fetchOrders();
     } catch (error) {
       console.error("Error canceling order:", error);
-      toast.error("Грешка при отменяне на поръчката");
+      toast.error("We could not cancel this order.");
     }
   };
 
@@ -169,11 +168,11 @@ const Orders = () => {
     <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Моите поръчки</h1>
+          <h1 className="text-2xl font-bold text-gray-900">My orders</h1>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <label htmlFor="sortBy" className="text-sm text-gray-700">
-                Сортирай по:
+                Sort by:
               </label>
               <select
                 id="sortBy"
@@ -181,14 +180,14 @@ const Orders = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="createdOn">Дата</option>
-                <option value="orderTotalPrice">Сума</option>
-                <option value="status">Статус</option>
+                <option value="createdOn">Date</option>
+                <option value="orderTotalPrice">Total</option>
+                <option value="status">Status</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="sortOrder" className="text-sm text-gray-700">
-                Посока:
+                Order:
               </label>
               <select
                 id="sortOrder"
@@ -196,13 +195,13 @@ const Orders = () => {
                 onChange={(e) => setSortDescending(e.target.value === 'desc')}
                 className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
-                <option value="desc">Низходящо</option>
-                <option value="asc">Възходящо</option>
+                <option value="desc">Newest first</option>
+                <option value="asc">Oldest first</option>
               </select>
             </div>
             <div className="flex items-center space-x-2">
               <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
-                Брой на страница:
+                Per page:
               </label>
               <select
                 id="itemsPerPage"
@@ -222,7 +221,7 @@ const Orders = () => {
 
         {!loading && orders && orders.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Нямате направени поръчки</p>
+            <p className="text-gray-500">You haven’t placed any orders yet.</p>
           </div>
         ) : (
           <>
@@ -237,10 +236,10 @@ const Orders = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h2 className="text-lg font-semibold text-gray-900">
-                            Поръчка #{order?.id ? order.id.slice(0, 8) : "N/A"}
+                            Order #{order?.id ? order.id.slice(0, 8) : "N/A"}
                           </h2>
                           <p className="text-sm text-gray-500">
-                            Дата:{" "}
+                            Date:{" "}
                             {order?.createdOn
                               ? formatDate(order.createdOn)
                               : "N/A"}
@@ -264,7 +263,7 @@ const Orders = () => {
                               className="flex items-center text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md"
                             >
                               <XMarkIcon className="h-5 w-5 mr-1" />
-                              Отмени поръчка
+                              Cancel order
                             </button>
                           )}
                         </div>
@@ -273,7 +272,7 @@ const Orders = () => {
                       <div className="mt-6 pt-6 border-t border-gray-200">
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-semibold text-gray-900">
-                            Обща сума:
+                            Order total:
                           </span>
                           <span className="text-lg font-semibold text-gray-900">
                             {new Intl.NumberFormat("bg-BG", {
@@ -303,7 +302,7 @@ const Orders = () => {
                   <ChevronLeftIcon className="h-5 w-5" />
                 </button>
                 <span className="text-gray-700">
-                  Страница {currentPage} от {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}

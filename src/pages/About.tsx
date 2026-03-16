@@ -6,28 +6,22 @@ const About = () => {
       <section className="border-b border-slate-200 bg-[linear-gradient(135deg,#1d4ed8_0%,#1e3a8a_55%,#0f172a_100%)]">
         <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.32em] text-primary-100">About SportGoods</p>
-          <h1 className="mt-5 font-display text-5xl font-bold tracking-tight text-white">The prototype baseline, upgraded for production polish</h1>
+          <h1 className="mt-5 font-display text-5xl font-bold tracking-tight text-white">A practical sports store built for regular training, not just browsing</h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-blue-100">
-            SportGoods combines a structured store experience with admin-oriented order and inventory
-            management. The result stays close to the original presentation flows while improving clarity,
-            responsiveness, and interface quality.
+            SportGoods brings together reliable equipment for runners, team sports players, gym members, and outdoor enthusiasts, with product information written for real buying decisions.
           </p>
         </div>
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-8">
         <div className="space-y-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Our story</p>
-          <h2 className="font-display text-3xl font-bold tracking-tight text-slate-950">Built around the shopping lifecycle in the project diagrams</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Our store</p>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-slate-950">Focused on everyday athletes and local teams</h2>
           <p className="text-base leading-7 text-slate-600">
-            The experience follows the presentation sequence closely: browse the catalog, inspect product
-            details, verify availability, place an order, and track status changes through a clear customer
-            and admin flow.
+            The catalog is built around sports people actually shop for week to week: daily running shoes, football boots, training apparel, tennis gear, and accessories that earn a place in the gym bag.
           </p>
           <p className="text-base leading-7 text-slate-600">
-            Behind the storefront sits an admin workspace focused on products, categories, users, order
-            statuses, and low-stock monitoring. The visual system has been upgraded to feel more like a modern
-            analytics dashboard without expanding the functional scope beyond the project requirements.
+            Orders, stock levels, and customer accounts are managed from the same platform, so the storefront stays clear while the admin side remains useful for day-to-day operations.
           </p>
         </div>
 
@@ -44,18 +38,18 @@ const About = () => {
         {[
           {
             icon: BuildingStorefrontIcon,
-            title: "Catalog-first UX",
-            description: "Category browsing, filter support, product detail views, and cart/checkout flows remain the core shopping path.",
+            title: "Curated categories",
+            description: "Running, football, training, outdoor, cycling, tennis, basketball, and accessories are kept easy to browse.",
           },
           {
             icon: TruckIcon,
-            title: "Operations visibility",
-            description: "Admins can follow order progress, inventory movement, and low-stock signals from one structured workspace.",
+            title: "Straightforward fulfillment",
+            description: "Customers can track order progress while the admin team follows stock and shipping status in one place.",
           },
           {
             icon: ShieldCheckIcon,
-            title: "Privacy and security",
-            description: "Password recovery, HTTPS redirection, GDPR export and account deletion entry points are available from the current implementation.",
+            title: "Account control",
+            description: "Password recovery, personal data export, and account management are available from the signed-in profile area.",
           },
         ].map((item) => (
           <article key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_24px_70px_-50px_rgba(15,23,42,0.5)]">

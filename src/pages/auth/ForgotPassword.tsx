@@ -33,7 +33,7 @@ const ForgotPassword = () => {
       setPreviewLink(data.previewResetLink ?? null);
     } catch (requestError) {
       console.error(requestError);
-      setError("Unable to prepare a password reset link right now.");
+      setError("We could not prepare a reset link right now.");
     } finally {
       setIsSubmitting(false);
     }
@@ -42,10 +42,10 @@ const ForgotPassword = () => {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
       <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_30px_90px_-55px_rgba(15,23,42,0.55)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Password recovery</p>
-        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Reset your account password</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Password reset</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Forgot your password?</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Enter your email address and the backend will prepare a reset link through the configured notification service.
+          Enter the email address linked to your account and we&apos;ll prepare a password reset link.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
           {message && <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</div>}
           {previewLink && (
             <div className="rounded-2xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-700">
-              Local development preview: <a href={previewLink} className="font-semibold underline">{previewLink}</a>
+              Development preview: <a href={previewLink} className="font-semibold underline">{previewLink}</a>
             </div>
           )}
           {error && <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
@@ -77,12 +77,12 @@ const ForgotPassword = () => {
             disabled={isSubmitting}
             className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Preparing..." : "Send reset link"}
+            {isSubmitting ? "Preparing link..." : "Send reset link"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-slate-500">
-          Back to <Link to="/login" className="font-semibold text-primary-600">login</Link>
+          Back to <Link to="/login" className="font-semibold text-primary-600">sign in</Link>
         </p>
       </div>
     </div>

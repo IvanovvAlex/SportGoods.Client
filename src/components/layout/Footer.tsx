@@ -8,8 +8,7 @@ const Footer = () => {
           <div>
             <p className="font-display text-2xl font-bold tracking-tight">SportGoods</p>
             <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">
-              Online sports store aligned to the project prototype: clear shopping flows, secure checkout,
-              category browsing, and an admin workspace for orders, inventory, and users.
+              Sports equipment for runners, teams, gym sessions, and weekend adventures, with clear product details and current stock information.
             </p>
           </div>
           <div className="grid gap-2 text-sm text-slate-400">
@@ -20,29 +19,29 @@ const Footer = () => {
         </div>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Platform</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Store</p>
           <div className="mt-5 grid gap-3 text-sm">
-            <Link to="/store" className="text-slate-300 transition hover:text-white">
-              Store
+            <Link to="/products" className="text-slate-300 transition hover:text-white">
+              Shop
             </Link>
             <Link to="/about" className="text-slate-300 transition hover:text-white">
               About us
             </Link>
             <Link to="/orders" className="text-slate-300 transition hover:text-white">
-              Order status
+              Order tracking
             </Link>
             <Link to="/profile" className="text-slate-300 transition hover:text-white">
-              Privacy and profile
+              Account
             </Link>
           </div>
         </div>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Operational</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Customer care</p>
           <div className="mt-5 space-y-3 rounded-3xl border border-slate-800 bg-white/5 p-5 text-sm text-slate-300">
-            <p>HTTPS enabled in backend startup.</p>
-            <p>Password reset, GDPR export, and account deletion entry points are available from the UI.</p>
-            <p>Order confirmation and status updates are prepared through the configured notification service.</p>
+            <p>Shipping across Bulgaria in 2 to 4 business days for in-stock items.</p>
+            <p>14-day returns on unused products in their original condition.</p>
+            <p>Support is available for sizing, order questions, and product availability.</p>
           </div>
         </div>
       </div>
@@ -50,7 +49,7 @@ const Footer = () => {
       <div className="border-t border-slate-800">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>&copy; {new Date().getFullYear()} SportGoods. All rights reserved.</p>
-          <p>Built for the SportGoods university project baseline and local developer workflows.</p>
+          <p>Prices and stock levels are updated regularly.</p>
         </div>
       </div>
     </footer>

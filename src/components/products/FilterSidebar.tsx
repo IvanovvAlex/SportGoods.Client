@@ -1,5 +1,5 @@
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 interface Category {
   id: string;
@@ -26,8 +26,8 @@ const FilterSidebar = ({
   onApplyFilters,
 }: FilterSidebarProps) => {
   const [searchInput, setSearchInput] = useState(searchQuery);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [selectedRating, setSelectedRating] = useState(0);
 
   const handleApplyAllFilters = () => {
@@ -35,21 +35,21 @@ const FilterSidebar = ({
       search: searchInput.trim(),
       minPrice: minPrice ? Number(minPrice) : null,
       maxPrice: maxPrice ? Number(maxPrice) : null,
-      rating: selectedRating || null
+      rating: selectedRating || null,
     });
   };
 
   const handleClearFilters = () => {
-    setSearchInput('');
-    setMinPrice('');
-    setMaxPrice('');
+    setSearchInput("");
+    setMinPrice("");
+    setMaxPrice("");
     setSelectedRating(0);
     onApplyFilters({
       category: null,
-      search: '',
+      search: "",
       minPrice: null,
       maxPrice: null,
-      rating: null
+      rating: null,
     });
   };
 
@@ -64,74 +64,74 @@ const FilterSidebar = ({
   };
 
   return (
-    <div className="w-full md:w-64 space-y-6">
+    <div className="w-full space-y-6 md:w-64">
       <div className="space-y-2">
         <div className="relative">
           <input
             type="text"
-            placeholder="Търсене на продукти..."
+            placeholder="Search products"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onChange={(event) => setSearchInput(event.target.value)}
+            className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
-          <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
         </div>
         <button
           onClick={handleApplyAllFilters}
-          className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:text-gray-900 hover:bg-primary-700"
+          className="w-full rounded-md bg-primary-600 px-4 py-2 text-white hover:bg-primary-700"
         >
-          Търси
+          Apply filters
         </button>
         <button
           onClick={handleClearFilters}
-          className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-primary-400 flex items-center justify-center space-x-1"
+          className="flex w-full items-center justify-center space-x-1 rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-primary-400"
         >
           <XMarkIcon className="h-5 w-5" />
-          <span>Премахни филтрите</span>
+          <span>Clear filters</span>
         </button>
       </div>
 
       <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Ценови диапазон</h3>
+        <h3 className="font-medium text-dark-700">Price range</h3>
         <div className="flex space-x-4">
           <input
             type="number"
-            placeholder="От"
+            placeholder="Min"
             value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onChange={(event) => setMinPrice(event.target.value)}
+            className="w-1/2 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <input
             type="number"
-            placeholder="До"
+            placeholder="Max"
             value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onChange={(event) => setMaxPrice(event.target.value)}
+            className="w-1/2 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
       </div>
-      
+
       <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Категории</h3>
+        <h3 className="font-medium text-dark-700">Categories</h3>
         <div className="space-y-2">
           <button
             onClick={() => handleCategoryChange(null)}
-            className={`w-full text-left px-4 py-2 rounded-md ${
+            className={`w-full rounded-md px-4 py-2 text-left ${
               !selectedCategory
-                ? 'bg-primary-100 text-primary-700'
-                : 'hover:text-gray-900 hover:bg-gray-100'
+                ? "bg-primary-100 text-primary-700"
+                : "hover:bg-gray-100 hover:text-gray-900"
             }`}
           >
-            Всички категории
+            All categories
           </button>
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryChange(category.id)}
-              className={`w-full text-left px-4 py-2 rounded-md ${
+              className={`w-full rounded-md px-4 py-2 text-left ${
                 selectedCategory === category.id
-                  ? 'bg-primary-100 text-gray-900'
-                  : 'hover:text-gray-900 hover:bg-gray-100'
+                  ? "bg-primary-100 text-gray-900"
+                  : "hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
               {category.name}
@@ -140,22 +140,20 @@ const FilterSidebar = ({
         </div>
       </div>
 
-      
-
       <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Рейтинг</h3>
+        <h3 className="font-medium text-dark-700">Rating</h3>
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((rating) => (
             <button
               key={rating}
               onClick={() => handleRatingChange(rating)}
-              className={`w-full text-left px-4 py-2 rounded-md ${
+              className={`w-full rounded-md px-4 py-2 text-left ${
                 selectedRating === rating
-                  ? 'bg-primary-100 text-gray-900'
-                  : 'hover:text-gray-900 hover:bg-gray-100'
+                  ? "bg-primary-100 text-gray-900"
+                  : "hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              {Array(rating).fill('★').join('')} и по-високо
+              {Array(rating).fill("★").join("")} & up
             </button>
           ))}
         </div>
