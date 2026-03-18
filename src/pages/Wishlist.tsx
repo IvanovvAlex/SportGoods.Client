@@ -104,7 +104,7 @@ const Wishlist = () => {
   if (wishlist.length === 0) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
+        <div className="max-w-md rounded-[2rem] bg-white p-8 text-center shadow-lg">
           <HeartIcon className="h-16 w-16 text-primary-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Your wishlist is empty
@@ -126,7 +126,7 @@ const Wishlist = () => {
   return (
     <div className="min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold text-gray-900">Wishlist</h1>
           <span className="text-gray-600">
             {wishlistProducts.length} {wishlistProducts.length === 1 ? "product" : "products"}
@@ -143,10 +143,10 @@ const Wishlist = () => {
             return (
               <div
                 key={product.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                className="overflow-hidden rounded-[2rem] bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
               >
               <div className="relative">
-                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
+                <div className="aspect-square w-full overflow-hidden bg-gray-200">
                   <img
                     src={product.mainImageUrl || "/placeholder-image.jpg"}
                     alt={product.title}
@@ -185,7 +185,7 @@ const Wishlist = () => {
                   </div>
                 </div>
 
-                <div className="flex space-x-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     onClick={() => handleAddToCart(product)}
                     className="flex-1 flex items-center justify-center bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600 transition-colors"

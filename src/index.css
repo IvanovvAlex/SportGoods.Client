@@ -9,17 +9,25 @@
   color: #0f172a;
   background: #f8fafc;
   text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
 }
 
 @layer base {
+  html {
+    overflow-x: clip;
+  }
+
   body {
     @apply min-h-screen bg-slate-50 text-slate-900;
+    overflow-x: clip;
   }
 
   #root {
     @apply min-h-screen;
+    overflow-x: clip;
   }
 
   a {
@@ -40,6 +48,20 @@
   select,
   textarea {
     font: inherit;
+    min-width: 0;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
   }
 }
 
@@ -54,6 +76,26 @@
 
   .muted-label {
     @apply text-sm font-semibold uppercase tracking-[0.24em] text-primary-600;
+  }
+
+  .table-scroll {
+    @apply overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rich-text-shell .ql-toolbar {
+    @apply rounded-t-2xl border-slate-200 bg-white;
+    overflow-x: auto;
+  }
+
+  .rich-text-shell .ql-container {
+    @apply rounded-b-2xl border-slate-200 bg-white text-sm text-slate-700;
+    min-height: 12rem;
+  }
+
+  .rich-text-shell .ql-editor {
+    min-height: 12rem;
+    overflow-wrap: anywhere;
   }
 }
 

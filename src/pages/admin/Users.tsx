@@ -247,7 +247,7 @@ const AdminUsers = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Manage customers</h1>
         <button
           onClick={() => {
@@ -273,8 +273,9 @@ const AdminUsers = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className="table-scroll">
+          <table className="min-w-[48rem] divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -337,7 +338,8 @@ const AdminUsers = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       {/* Edit/View Modal */}
@@ -422,7 +424,7 @@ const AdminUsers = () => {
                   )}
                 </div>
 
-                <div className="flex justify-end space-x-2 sm:space-x-3 mt-4 sm:mt-6">
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:mt-6 sm:flex-row sm:justify-end sm:gap-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -460,7 +462,7 @@ const AdminUsers = () => {
             <p className="mb-4 sm:mb-6 text-gray-600 text-xs sm:text-sm">
               Delete the customer "{selectedUser.names}"?
             </p>
-            <div className="flex justify-end space-x-2 sm:space-x-3">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-xs sm:text-sm"

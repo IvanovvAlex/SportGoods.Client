@@ -435,12 +435,12 @@ const AdminProducts = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-[calc(100vh-4rem)] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Manage products</h1>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="sortBy" className="text-sm text-gray-700">
                 Sort by:
               </label>
@@ -456,7 +456,7 @@ const AdminProducts = () => {
                 <option value="rating">Rating</option>
               </select>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="sortOrder" className="text-sm text-gray-700">
                 Order:
               </label>
@@ -470,7 +470,7 @@ const AdminProducts = () => {
                 <option value="asc">Ascending</option>
               </select>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
                 Per page:
               </label>
@@ -509,8 +509,9 @@ const AdminProducts = () => {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
+            <div className="overflow-hidden rounded-lg bg-white shadow">
+              <div className="table-scroll">
+                <table className="min-w-[56rem] divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -573,11 +574,12 @@ const AdminProducts = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
 
             {/* Pagination Controls */}
-            <div className="mt-8 flex justify-center items-center space-x-2">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -611,14 +613,14 @@ const AdminProducts = () => {
       {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-white rounded-lg p-3 sm:p-6 w-[80%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-h-[90vh] overflow-y-auto">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white p-3 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
               {editingProduct
                 ? "Edit product"
                 : "Add product"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Name
@@ -667,18 +669,20 @@ const AdminProducts = () => {
                     </p>
                   )}
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description
                   </label>
-                  <ReactQuill
-                    theme="snow"
-                    value={formData.description}
-                    onChange={handleDescriptionChange}
-                    className={
-                      validationErrors.description ? "border-red-300" : ""
-                    }
-                  />
+                  <div className="rich-text-shell">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.description}
+                      onChange={handleDescriptionChange}
+                      className={
+                        validationErrors.description ? "border-red-300" : ""
+                      }
+                    />
+                  </div>
                   {validationErrors.description && (
                     <p className="mt-1 text-sm text-red-600">
                       {validationErrors.description}
@@ -690,7 +694,9 @@ const AdminProducts = () => {
                     Regular price (EUR)
                   </label>
                   <input
-                    type="string"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
                     name="regularPrice"
                     value={formData.regularPrice}
                     onChange={handleInputChange}
@@ -712,7 +718,9 @@ const AdminProducts = () => {
                     Sale price (EUR)
                   </label>
                   <input
-                    type="string"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
                     name="discountedPrice"
                     value={formData.discountedPrice}
                     onChange={handleInputChange}
@@ -734,7 +742,8 @@ const AdminProducts = () => {
                     Stock
                   </label>
                   <input
-                    type="string"
+                    type="number"
+                    inputMode="numeric"
                     name="stock"
                     value={formData.stock}
                     onChange={handleInputChange}
@@ -773,7 +782,7 @@ const AdminProducts = () => {
                     </p>
                   )}
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700">
                     Main image URL
                   </label>
@@ -794,7 +803,7 @@ const AdminProducts = () => {
                     </p>
                   )}
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Secondary image URLs
@@ -808,7 +817,7 @@ const AdminProducts = () => {
                     </button>
                   </div>
                   {formData.secondaryImages.map((url, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
+                    <div key={index} className="mb-2 flex flex-col gap-2 sm:flex-row">
                       <input
                         type="url"
                         value={url.uri}
@@ -841,7 +850,7 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => {
@@ -879,7 +888,7 @@ const AdminProducts = () => {
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && productToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-white rounded-lg p-3 sm:p-6 w-[95%] sm:w-[80%] md:w-[60%] lg:w-[40%]">
+          <div className="w-full max-w-lg rounded-lg bg-white p-3 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
               Delete product
             </h2>
@@ -887,7 +896,7 @@ const AdminProducts = () => {
               Delete the product "
               {productToDelete.title}"?
             </p>
-            <div className="flex justify-end space-x-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"

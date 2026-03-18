@@ -69,9 +69,9 @@ const Register = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-50 px-4 py-14">
-      <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)]">
+      <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_32px_90px_-55px_rgba(15,23,42,0.55)] sm:p-8">
         <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Create account</p>
-        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-slate-950">Create your SportGoods account</h1>
+        <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Create your SportGoods account</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
           Save your details for faster checkout, keep a wishlist, and follow your orders from one place.
         </p>

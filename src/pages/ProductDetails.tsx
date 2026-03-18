@@ -461,13 +461,13 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <ToastContainer />
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="relative aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100">
+            <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] bg-gray-100">
               <img
                 src={
                   selectedImage === 0
@@ -486,7 +486,7 @@ const ProductDetails = () => {
                     return (prev - 1 + totalImages) % totalImages;
                   })
                 }
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md transition-colors group border-2 border-black"
+                className="group absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2.5 shadow-md transition-colors hover:border-primary-300"
                 aria-label="Previous image"
               >
                 <svg
@@ -512,7 +512,7 @@ const ProductDetails = () => {
                     return (prev + 1) % totalImages;
                   })
                 }
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-md transition-colors group border-2 border-black"
+                className="group absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2.5 shadow-md transition-colors hover:border-primary-300"
                 aria-label="Next image"
               >
                 <svg
@@ -534,10 +534,10 @@ const ProductDetails = () => {
 
             {/* Secondary Images Gallery */}
             {product.secondaryImages && product.secondaryImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3">
                 {/* Primary Image Thumbnail */}
                 <div
-                  className={`aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity ${
+                  className={`aspect-square overflow-hidden rounded-2xl bg-gray-100 cursor-pointer transition-opacity hover:opacity-75 ${
                     selectedImage === 0 ? "ring-2 ring-primary-500" : ""
                   }`}
                   onClick={() => setSelectedImage(0)}
@@ -553,7 +553,7 @@ const ProductDetails = () => {
                 {product.secondaryImages.map((image, index) => (
                   <div
                     key={index}
-                    className={`aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity ${
+                    className={`aspect-square overflow-hidden rounded-2xl bg-gray-100 cursor-pointer transition-opacity hover:opacity-75 ${
                       selectedImage === index + 1
                         ? "ring-2 ring-primary-500"
                         : ""
@@ -573,12 +573,12 @@ const ProductDetails = () => {
 
           {/* Product Info */}
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
               {product.title}
             </h1>
 
             {/* Rating Display */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <StarIcon
@@ -605,7 +605,7 @@ const ProductDetails = () => {
             {/* Price */}
             <div className="space-y-2">
               {product.discountPercentage ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap items-center gap-3">
                   <span className="text-2xl font-bold text-primary-600">
                     {formatCurrency(product.discountedPrice)}
                   </span>
@@ -682,7 +682,7 @@ const ProductDetails = () => {
 
             {/* Quantity Selector - Only show if product is in stock */}
             {product.quantity > 0 && (
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <label
                   htmlFor="quantity"
                   className="text-sm font-medium text-gray-700"
@@ -698,10 +698,11 @@ const ProductDetails = () => {
                     -
                   </button>
                   <input
-                    type="string"
+                    type="number"
                     id="quantity"
-                    min="1"
+                    min={1}
                     max={product.quantity}
+                    inputMode="numeric"
                     value={quantity}
                     onChange={(e) =>
                       setQuantity(
@@ -730,7 +731,7 @@ const ProductDetails = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex space-x-4">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={handleAddToCart}
                 className={`flex-1 px-6 py-3 rounded-md transition-colors ${
@@ -745,7 +746,7 @@ const ProductDetails = () => {
               {token && (
                 <button
                   onClick={handleWishlistToggle}
-                  className="p-3 border rounded-md bg-gray-100 hover:bg-primary-100 transition-colors"
+                  className="flex items-center justify-center rounded-md border bg-gray-100 p-3 transition-colors hover:bg-primary-100 sm:w-auto"
                   title={
                     isInWishlist
                       ? "Remove from wishlist"
@@ -771,7 +772,7 @@ const ProductDetails = () => {
 
           {/* Add Review Form */}
           {token ? (
-            <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+            <div className="mb-8 rounded-lg border bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Write a review</h3>
               <form onSubmit={handleReviewSubmit} className="space-y-6">
                 <div>
@@ -808,7 +809,7 @@ const ProductDetails = () => {
                   <label className="block text-sm font-medium text-gray-700">
                     Comment
                   </label>
-                  <div className="relative border rounded-md">
+                  <div className="rich-text-shell relative">
                     <ReactQuill
                       value={newReviewComment}
                       onChange={setNewReviewComment}
@@ -846,11 +847,11 @@ const ProductDetails = () => {
 
           {/* Reviews List Section */}
           <div className="mt-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-2xl font-bold text-gray-900">
                 All reviews
               </h2>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 {/* Sorting Controls */}
                 <select
                   value={sortBy}
@@ -913,18 +914,17 @@ const ProductDetails = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Comment
                             </label>
-                            <div className="relative border rounded-md">
+                            <div className="rich-text-shell relative">
                               <ReactQuill
                                 value={editContent}
                                 onChange={setEditContent}
                                 modules={quillModules}
                                 formats={quillFormats}
-                                className="quill"
                                 theme="snow"
                               />
                             </div>
                           </div>
-                          <div className="flex space-x-2 mt-4">
+                          <div className="mt-4 flex flex-wrap gap-2">
                             <button
                               type="submit"
                               className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors"
@@ -942,8 +942,8 @@ const ProductDetails = () => {
                         </form>
                       ) : (
                         <>
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center space-x-4">
+                          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex items-start space-x-4">
                               <div className="flex">
                                 {[...Array(5)].map((_, i) => (
                                   <StarIcon
@@ -975,7 +975,7 @@ const ProductDetails = () => {
                             {/* Only show edit/delete buttons if the current user is the review creator */}
                             {currentUserId &&
                               review.userId === currentUserId && (
-                                <div className="flex space-x-2">
+                                <div className="flex shrink-0 items-center gap-2 self-start">
                                   <button
                                     onClick={() => startEditing(review)}
                                     className="text-white hover:text-white p-1"
@@ -1011,8 +1011,8 @@ const ProductDetails = () => {
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="mt-8 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPageNumber(1)}
                         disabled={pageNumber === 1}
@@ -1031,7 +1031,7 @@ const ProductDetails = () => {
                       </button>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex max-w-full flex-wrap items-center gap-2">
                       {[...Array(totalPages)].map((_, idx) => (
                         <button
                           key={idx + 1}
@@ -1047,7 +1047,7 @@ const ProductDetails = () => {
                       ))}
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() =>
                           setPageNumber((prev) =>

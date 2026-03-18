@@ -201,7 +201,7 @@ const Cart = () => {
   if (!cart || cart.items.length === 0) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-xl text-center">
+        <div className="w-full max-w-md space-y-8 rounded-[2rem] bg-white p-6 text-center shadow-xl sm:p-8">
           <h2 className="text-2xl font-bold text-gray-900">
             Your cart is empty
           </h2>
@@ -220,7 +220,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <ToastContainer
         position="bottom-right"
         autoClose={3000}
@@ -233,28 +233,28 @@ const Cart = () => {
         pauseOnHover
         theme="light"
       />
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-center mb-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex items-center justify-center">
           <h1 className="text-3xl font-bold text-gray-900">Cart</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="overflow-hidden rounded-[2rem] bg-white shadow-xl">
           <div className="divide-y divide-gray-200">
             {cart.items.map((item) => (
               <div
                 key={item.productId}
-                className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                className="flex flex-col gap-4 p-5 sm:p-6 lg:flex-row lg:items-center"
               >
                 <img
                   src={item.primaryImageUri || "/placeholder-image.jpg"}
                   alt={item.title}
-                  className="h-32 w-32 object-cover rounded-lg"
+                  className="h-24 w-24 rounded-2xl object-cover sm:h-28 sm:w-28"
                 />
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                  <h3 className="line-clamp-2 text-lg font-medium text-gray-900">
                     {item.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
                     <p className="text-primary-600 font-semibold">
                       {formatCurrency(item.singlePrice)}
                     </p>
@@ -269,35 +269,36 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-gray-300 rounded-md">
+                <div className="flex w-full flex-wrap items-center justify-between gap-3 lg:w-auto lg:justify-end">
+                  <div className="flex items-center rounded-xl border border-gray-300 bg-slate-50">
                     <button
                       onClick={() =>
                         handleQuantityChange(item.productId, item.quantity - 1)
                       }
-                      className={`px-3 py-1 transition-colors p-2 ${
+                      className={`px-3 py-2 transition-colors ${
                         item.quantity <= 1
-                          ? "bg-gray-400 cursor-not-allowed text-white hover:bg-gray-400"
-                          : "px-3 py-1 text-white transition-colors p-2"
+                          ? "cursor-not-allowed text-slate-300"
+                          : "text-slate-700 hover:text-primary-700"
                       }`}
+                      disabled={item.quantity <= 1}
                     >
                       -
                     </button>
-                    <span className="px-3 py-1 text-gray-900">
+                    <span className="min-w-[2.5rem] px-3 py-2 text-center text-gray-900">
                       {item.quantity}
                     </span>
                     <button
                       onClick={() =>
                         handleQuantityChange(item.productId, item.quantity + 1)
                       }
-                      className="px-3 py-1 text-white transition-colors p-2"
+                      className="px-3 py-2 text-slate-700 transition-colors hover:text-primary-700"
                     >
                       +
                     </button>
                   </div>
                   <button
                     onClick={() => handleRemoveItem(item.productId)}
-                    className="text-white transition-colors p-2"
+                    className="rounded-full border border-rose-200 p-2 text-rose-600 transition-colors hover:bg-rose-50"
                     title="Remove from cart"
                   >
                     <XMarkIcon className="h-5 w-5" />
@@ -307,8 +308,8 @@ const Cart = () => {
             ))}
           </div>
 
-          <div className="p-6 bg-gray-50">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="bg-gray-50 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <p className="text-xl font-semibold text-gray-900">
                   Order total: {formatCurrency(cart.orderTotalPrice)}

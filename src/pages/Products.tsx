@@ -196,61 +196,61 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.55)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
+            <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Store</p>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">
-              {getCategoryName(filters.category)
+              <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">
+                {getCategoryName(filters.category)
                   ? `${getCategoryName(filters.category)} products`
                   : "All products"}
-            </h1>
-            <p className="mt-2 text-sm text-slate-600">
+              </h1>
+              <p className="mt-2 text-sm text-slate-600">
                 Showing {products.length} of {totalCount} products. Use category, price, and rating filters to narrow the list.
-            </p>
-          </div>
-            <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center space-x-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
-              <label htmlFor="pageSize" className="text-sm text-slate-600">
-                Per page:
-              </label>
-              <select
-                id="pageSize"
-                value={filters.pageSize}
-                onChange={handlePageSizeChange}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 outline-none"
-              >
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+              </p>
             </div>
-            {user?.role === "Admin" && (
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
+                <label htmlFor="pageSize" className="text-sm text-slate-600">
+                  Per page:
+                </label>
+                <select
+                  id="pageSize"
+                  value={filters.pageSize}
+                  onChange={handlePageSizeChange}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 outline-none"
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              {user?.role === "Admin" && (
                 <div className="flex flex-wrap gap-3">
-                <Link
+                  <Link
                     to="/admin/products"
                     className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
-                >
+                  >
                     <PencilIcon className="mr-2 h-5 w-5" />
                     Manage products
-                </Link>
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
-                >
+                  </Link>
+                  <Link
+                    to="/admin"
+                    className="inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-600"
+                  >
                     <PlusIcon className="mr-2 h-5 w-5" />
                     Open dashboard
-                </Link>
-              </div>
-            )}
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        </div>
 
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col gap-8 xl:flex-row">
           <FilterSidebar
             categories={categories}
             selectedCategory={filters.category}
@@ -258,8 +258,8 @@ const Products = () => {
             onApplyFilters={handleApplyFilters}
           />
 
-          <div className="flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -275,18 +275,18 @@ const Products = () => {
 
             {totalPages > 1 && (
               <div className="flex justify-center mt-8">
-                <nav className="flex items-center space-x-2">
+                <nav className="flex max-w-full flex-wrap items-center justify-center gap-2">
                   <button
                     onClick={() => handlePageChange(1)}
                     disabled={filters.pageNumber === 1}
-                    className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                    className="min-w-[2.5rem] rounded-md border border-gray-300 px-3 py-1 disabled:opacity-50"
                   >
                     &laquo;
                   </button>
                   <button
                     onClick={() => handlePageChange(filters.pageNumber - 1)}
                     disabled={filters.pageNumber === 1}
-                    className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                    className="min-w-[2.5rem] rounded-md border border-gray-300 px-3 py-1 disabled:opacity-50"
                   >
                     &lsaquo;
                   </button>
@@ -306,7 +306,7 @@ const Products = () => {
                         )}
                         <button
                           onClick={() => handlePageChange(page)}
-                          className={`px-3 py-1 rounded-md ${
+                          className={`min-w-[2.5rem] rounded-md px-3 py-1 ${
                             filters.pageNumber === page
                               ? "bg-primary-600 text-white"
                               : "border border-gray-300 hover:bg-gray-100"
@@ -320,14 +320,14 @@ const Products = () => {
                   <button
                     onClick={() => handlePageChange(filters.pageNumber + 1)}
                     disabled={filters.pageNumber === totalPages}
-                    className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                    className="min-w-[2.5rem] rounded-md border border-gray-300 px-3 py-1 disabled:opacity-50"
                   >
                     &rsaquo;
                   </button>
                   <button
                     onClick={() => handlePageChange(totalPages)}
                     disabled={filters.pageNumber === totalPages}
-                    className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                    className="min-w-[2.5rem] rounded-md border border-gray-300 px-3 py-1 disabled:opacity-50"
                   >
                     &raquo;
                   </button>

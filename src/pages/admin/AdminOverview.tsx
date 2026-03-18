@@ -165,7 +165,7 @@ const AdminOverview = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
           {
             label: "Orders today",
@@ -203,7 +203,7 @@ const AdminOverview = () => {
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.55)]">
           <div className="flex items-center justify-between">
             <div>
@@ -264,10 +264,11 @@ const AdminOverview = () => {
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-slate-200">
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate-500">Customer</th>
+          <div className="table-scroll">
+            <table className="min-w-[36rem] divide-y divide-slate-200 text-sm">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 text-left font-medium text-slate-500">Customer</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-500">Items</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-500">Status</th>
                 <th className="px-4 py-3 text-right font-medium text-slate-500">Total</th>
@@ -290,7 +291,8 @@ const AdminOverview = () => {
                 </tr>
               )}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       </section>
     </div>

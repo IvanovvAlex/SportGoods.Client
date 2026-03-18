@@ -56,12 +56,12 @@ const Home = () => {
     <div className="bg-slate-50">
       <section className="relative overflow-hidden border-b border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(96,165,250,0.18),_transparent_32%),linear-gradient(115deg,#081123_0%,#172554_48%,#1f3a8a_100%)]">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_50%,transparent_100%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-primary-100">
               New season essentials
             </span>
-            <h1 className="mt-8 font-display text-5xl font-bold tracking-tight text-white sm:text-6xl">
+            <h1 className="mt-8 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Equipment that holds up in training and on match day
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-200">
@@ -103,7 +103,7 @@ const Home = () => {
               <img
                 src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80"
                 alt="Running shoes"
-                className="h-full min-h-[420px] w-full rounded-[1.5rem] object-cover"
+                className="h-full min-h-[280px] w-full rounded-[1.5rem] object-cover sm:min-h-[420px]"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ const Home = () => {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Shop by sport</p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">Browse the catalog by activity</h2>
@@ -179,10 +179,10 @@ const Home = () => {
 
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Popular right now</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">Best-selling products</h2>
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary-600">Popular right now</p>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950">Best-selling products</h2>
             </div>
             <Link to="/products" className="hidden text-sm font-semibold text-slate-700 transition hover:text-primary-600 sm:inline-flex">
               Open catalog

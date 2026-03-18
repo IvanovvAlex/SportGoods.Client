@@ -6,7 +6,7 @@ const About = () => {
       <section className="border-b border-slate-200 bg-[linear-gradient(135deg,#1d4ed8_0%,#1e3a8a_55%,#0f172a_100%)]">
         <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.32em] text-primary-100">About SportGoods</p>
-          <h1 className="mt-5 font-display text-5xl font-bold tracking-tight text-white">A practical sports store built for regular training, not just browsing</h1>
+          <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">A practical sports store built for regular training, not just browsing</h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-blue-100">
             SportGoods brings together reliable equipment for runners, team sports players, gym members, and outdoor enthusiasts, with product information written for real buying decisions.
           </p>
@@ -29,7 +29,7 @@ const About = () => {
           <img
             src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80"
             alt="Basketball court"
-            className="h-full min-h-[420px] w-full rounded-[1.5rem] object-cover"
+            className="h-full min-h-[280px] w-full rounded-[1.5rem] object-cover sm:min-h-[420px]"
           />
         </div>
       </section>

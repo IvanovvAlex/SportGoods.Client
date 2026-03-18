@@ -64,101 +64,116 @@ const FilterSidebar = ({
   };
 
   return (
-    <div className="w-full space-y-6 md:w-64">
-      <div className="space-y-2">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search products"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+    <aside className="w-full xl:sticky xl:top-24 xl:w-72 xl:self-start">
+      <div className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_24px_70px_-55px_rgba(15,23,42,0.55)] sm:p-6">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Filters</p>
+          <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-slate-950">Refine the catalog</h2>
+          <p className="mt-2 text-sm text-slate-500">Search by name and narrow the product list by category, price, and rating.</p>
         </div>
-        <button
-          onClick={handleApplyAllFilters}
-          className="w-full rounded-md bg-primary-600 px-4 py-2 text-white hover:bg-primary-700"
-        >
-          Apply filters
-        </button>
-        <button
-          onClick={handleClearFilters}
-          className="flex w-full items-center justify-center space-x-1 rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-primary-400"
-        >
-          <XMarkIcon className="h-5 w-5" />
-          <span>Clear filters</span>
-        </button>
-      </div>
 
-      <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Price range</h3>
-        <div className="flex space-x-4">
-          <input
-            type="number"
-            placeholder="Min"
-            value={minPrice}
-            onChange={(event) => setMinPrice(event.target.value)}
-            className="w-1/2 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxPrice}
-            onChange={(event) => setMaxPrice(event.target.value)}
-            className="w-1/2 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Categories</h3>
-        <div className="space-y-2">
-          <button
-            onClick={() => handleCategoryChange(null)}
-            className={`w-full rounded-md px-4 py-2 text-left ${
-              !selectedCategory
-                ? "bg-primary-100 text-primary-700"
-                : "hover:bg-gray-100 hover:text-gray-900"
-            }`}
-          >
-            All categories
-          </button>
-          {categories.map((category) => (
+        <div className="space-y-3">
+          <div className="relative">
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search products"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 py-2 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+            />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
             <button
-              key={category.id}
-              onClick={() => handleCategoryChange(category.id)}
-              className={`w-full rounded-md px-4 py-2 text-left ${
-                selectedCategory === category.id
-                  ? "bg-primary-100 text-gray-900"
-                  : "hover:bg-gray-100 hover:text-gray-900"
+              type="button"
+              onClick={handleApplyAllFilters}
+              className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-600"
+            >
+              Apply filters
+            </button>
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
+            >
+              <XMarkIcon className="h-5 w-5" />
+              <span>Clear filters</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Price range</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="number"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(event) => setMinPrice(event.target.value)}
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(event) => setMaxPrice(event.target.value)}
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-4 focus:ring-primary-100"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Categories</h3>
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => handleCategoryChange(null)}
+              className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
+                !selectedCategory
+                  ? "bg-primary-50 text-primary-700"
+                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950"
               }`}
             >
-              {category.name}
+              All categories
             </button>
-          ))}
+            {categories.map((category) => (
+              <button
+                type="button"
+                key={category.id}
+                onClick={() => handleCategoryChange(category.id)}
+                className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
+                  selectedCategory === category.id
+                    ? "bg-primary-50 text-primary-700"
+                    : "bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-4">
-        <h3 className="font-medium text-dark-700">Rating</h3>
-        <div className="space-y-2">
-          {[5, 4, 3, 2, 1].map((rating) => (
-            <button
-              key={rating}
-              onClick={() => handleRatingChange(rating)}
-              className={`w-full rounded-md px-4 py-2 text-left ${
-                selectedRating === rating
-                  ? "bg-primary-100 text-gray-900"
-                  : "hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              {Array(rating).fill("★").join("")} & up
-            </button>
-          ))}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Rating</h3>
+          <div className="space-y-2">
+            {[5, 4, 3, 2, 1].map((rating) => (
+              <button
+                type="button"
+                key={rating}
+                onClick={() => handleRatingChange(rating)}
+                className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
+                  selectedRating === rating
+                    ? "bg-primary-50 text-primary-700"
+                    : "bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950"
+                }`}
+              >
+                {Array(rating).fill("★").join("")} & up
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

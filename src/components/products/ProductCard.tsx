@@ -84,7 +84,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <img
             src={product.mainImageUrl || "/placeholder-image.jpg"}
             alt={product.title}
-            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-60 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-64"
           />
           {product.discountPercentage ? (
             <span className="absolute left-4 top-4 rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-white">
@@ -122,7 +122,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {product.description.replace(/<[^>]+>/g, " ")}
           </p>
 
-          <div className="mt-6 flex items-end justify-between gap-4">
+          <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="font-display text-2xl font-bold text-slate-950">{formatCurrency(displayPrice)}</p>
               {product.discountedPrice && product.discountedPrice > 0 ? (

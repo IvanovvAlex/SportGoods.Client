@@ -195,7 +195,7 @@ const AdminCategories = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Manage categories</h1>
         <button
           onClick={handleAddCategory}
@@ -212,8 +212,9 @@ const AdminCategories = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className="table-scroll">
+          <table className="min-w-[28rem] divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -249,13 +250,14 @@ const AdminCategories = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       {/* Edit/Add Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6">
             <h2 className="text-xl font-bold mb-4">
               {editingCategory ? "Edit category" : "Add category"}
             </h2>
@@ -301,7 +303,7 @@ const AdminCategories = () => {
                 )}
               </div>
 
-              <div className="flex justify-end space-x-3">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => {
@@ -329,7 +331,7 @@ const AdminCategories = () => {
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="w-full max-w-md rounded-lg bg-white p-6">
             <h2 className="text-xl font-bold mb-4 text-gray-900">Delete category</h2>
             <p className="mb-6 text-gray-600">
               Delete the category "{categoryToDelete?.name}"?
@@ -339,7 +341,7 @@ const AdminCategories = () => {
                 </span>
               )}
             </p>
-            <div className="flex justify-end space-x-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"

@@ -68,13 +68,13 @@ const Navbar = () => {
           {isMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
         </button>
 
-        <Link to="/" className="flex min-w-fit items-center gap-3">
+        <Link to="/" className="flex min-w-0 flex-1 items-center gap-3 md:flex-none">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.9)]">
             SG
           </div>
-          <div>
-            <p className="font-display text-lg font-bold tracking-tight text-slate-950">SportGoods</p>
-            <p className="text-xs text-slate-500">Gear for training days and match days</p>
+          <div className="min-w-0">
+            <p className="truncate font-display text-lg font-bold tracking-tight text-slate-950">SportGoods</p>
+            <p className="hidden truncate text-xs text-slate-500 xl:block">Gear for training days and match days</p>
           </div>
         </Link>
 
@@ -162,7 +162,7 @@ const Navbar = () => {
       </div>
 
       {isMenuOpen && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-slate-200 bg-white px-4 py-4 sm:px-6 md:hidden">
           <form onSubmit={handleSearchSubmit} className="mb-4">
             <div className="relative">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />

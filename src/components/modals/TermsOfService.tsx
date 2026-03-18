@@ -20,11 +20,11 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-white " />
+          <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+        <div className="fixed inset-0 overflow-y-auto p-4 sm:p-6">
+          <div className="flex min-h-full items-end justify-center text-center sm:items-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -34,21 +34,21 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-dark-200 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-[2rem] bg-white p-5 text-left align-middle shadow-xl transition-all sm:p-6">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-dark-700 flex justify-between items-center"
+                  className="flex items-center justify-between gap-4 text-lg font-medium leading-6 text-slate-950"
                 >
                   <span>Terms of service</span>
                   <button
                     type="button"
-                    className="rounded-md text-dark-500 hover:text-dark-700"
+                    className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-primary-300 hover:text-primary-700"
                     onClick={onClose}
                   >
                     <XMarkIcon className="h-6 w-6" />
                   </button>
                 </Dialog.Title>
-                <div className="mt-4 space-y-4 text-dark-700 max-h-[60vh] overflow-y-auto">
+                <div className="mt-4 max-h-[65vh] space-y-4 overflow-y-auto pr-2 text-slate-700">
                   <section className="space-y-2">
                     <h4 className="font-semibold">1. General</h4>
                     <p className="text-sm">
@@ -95,7 +95,7 @@ const TermsOfService = ({ isOpen, onClose }: TermsOfServiceProps) => {
                 <div className="mt-6">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                    className="inline-flex w-full justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 sm:w-auto"
                     onClick={onClose}
                   >
                     Close

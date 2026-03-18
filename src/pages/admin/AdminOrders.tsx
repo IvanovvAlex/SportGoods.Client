@@ -147,12 +147,12 @@ const AdminOrders = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-[calc(100vh-4rem)] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="sortBy" className="text-sm text-gray-700">
                 Sort by:
               </label>
@@ -167,7 +167,7 @@ const AdminOrders = () => {
                 <option value="status">Status</option>
               </select>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="sortOrder" className="text-sm text-gray-700">
                 Order:
               </label>
@@ -181,7 +181,7 @@ const AdminOrders = () => {
                 <option value="asc">Oldest first</option>
               </select>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
                 Per page:
               </label>
@@ -212,10 +212,10 @@ const AdminOrders = () => {
                 orders.map((order) => (
                   <div
                     key={order?.id || Math.random()}
-                    className="bg-white rounded-lg shadow overflow-hidden"
+                    className="overflow-hidden rounded-[2rem] bg-white shadow"
                   >
                     <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
+                      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <h2 className="text-lg font-semibold text-gray-900">
                             Order #{order?.id ? order.id.slice(0, 8) : "N/A"}
@@ -227,7 +227,7 @@ const AdminOrders = () => {
                               : "N/A"}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-4">
+                        <div className="flex flex-wrap items-center gap-3">
                           <div className="relative">
                             <select
                               value={order?.status ?? OrderStatus.Created}
@@ -238,7 +238,7 @@ const AdminOrders = () => {
                                   parseInt(e.target.value)
                                 )
                               }
-                              className={`appearance-none rounded-md pl-3 pr-8 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${getOrderStatusColor(
+                              className={`w-full appearance-none rounded-md py-1 pl-3 pr-8 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 sm:w-auto ${getOrderStatusColor(
                                 order?.status ?? OrderStatus.Created
                               )}`}
                             >
@@ -254,7 +254,7 @@ const AdminOrders = () => {
                       </div>
 
                       <div className="mt-6 pt-6 border-t border-gray-200">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                           <span className="text-lg font-semibold text-gray-900">
                             Order total:
                           </span>
@@ -270,7 +270,7 @@ const AdminOrders = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex justify-center items-center space-x-2">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}

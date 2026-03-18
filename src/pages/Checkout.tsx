@@ -161,7 +161,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+    <div className="bg-slate-50 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <button
           type="button"
@@ -297,12 +297,12 @@ const Checkout = () => {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary-600">Order summary</p>
               <div className="mt-6 space-y-4">
                 {cart?.items.map((item) => (
-                  <div key={item.productId} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                    <div>
+                  <div key={item.productId} className="flex items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">{item.title}</p>
                       <p className="text-xs text-slate-500">Quantity: {item.quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice)}</p>
+                    <p className="shrink-0 text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice)}</p>
                   </div>
                 ))}
               </div>
